@@ -340,6 +340,12 @@ End;
 (*
  * Displays package information
  *)
+Function PrintDesc(nd : StrListNodePtr) : StrListWalkResult;
+Begin
+	WriteLn(#9, nd^.Key);
+	PrintDesc := slContinue;
+End;
+
 Procedure PrintPackage(node : BTreeNodePtr);
 Var	data : PKGPtr;
 Begin
