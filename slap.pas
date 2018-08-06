@@ -1,6 +1,9 @@
 (* kate: default-dictionary en; tab-indents true; tab-width 4; indent-width 4; replace-tabs off; replace-tabs-save off; line-numbers on;
  * 
- * slap - An Automated packaging tool for Slackware Linux
+ * Slap main CLI
+ * 
+ * This file is part of 'slap' project.
+ * 'Slap' is an Automated packaging tool for Slackware Linux.
  * Copyright (C) 2018 Nicholas Christopoulos
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -17,7 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  * 
- * Project Page: http://...
+ * Project Page: https://github.com/nereusx/slap
  * Nicholas Christopoulos nereus@freemail.gr
  * 
  *)
