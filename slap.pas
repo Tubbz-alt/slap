@@ -340,20 +340,30 @@ End;
 (*
  * Displays package information
  *)
+Var pd_last : String;
+Var pd_n : Integer;
 Function PrintDesc(nd : StrListNodePtr) : StrListWalkResult;
+Var ll, ls : Integer;
 Begin
-	WriteLn(#9, nd^.Key);
+	Inc(pd_n);
+	ll := Length(pd_last);
+	pd_last := Trim(nd^.Key);
+	ls := Length(pd_last);
+	if (ll <> 0) OR (ls <> 0) then begin
+		if (pd_n = 2) and (ls <> 0) then
+			WriteLn;
+		WriteLn(#9, nd^.Key);
+	end;
 	PrintDesc := slContinue;
 End;
-
 Procedure PrintPackage(node : BTreeNodePtr);
-Var	data : PKGPtr;
+Var	data	: PKGPtr;
 Begin
 	data := node^.Ptr;
 	if opt_names then
 		WriteLn(data^.Name)
 	else begin
-		WriteLn('PACKAGE   : ', data^.Name);
+		WriteLn('PACKAGE      : ', data^.Name);
 {		WriteLn('Filename     : ', data^.FName); }
 		Write('Repositories : ');
 		data^.Repos.Print(#32);
@@ -364,8 +374,12 @@ Begin
 {		WriteLn('Variables    : ', data^.Vars); }
 		WriteLn('Variables    : ');
 		data^.Vars.Print;
-		WriteLn('Description  :');
+		WriteLn('DESCRIPTION');
+		pd_last := '';
+		pd_n := 0;
 		data^.Desc.Walk(@PrintDesc);
+		if Length(pd_last) > 0 then
+			WriteLn;
 	End
 End;
 
