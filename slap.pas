@@ -35,6 +35,8 @@ Const
 	PKGDataDir  = '/var/lib/slackpkg';
 	PKGDataFile = '/var/lib/slackpkg/PACKAGES.TXT';
 	REPDataFile = '/var/lib/slackpkg/pkglist';
+	SPP_SIGN    = 'SLACKPKGPLUS_';
+	SPP_SIGN_L  = 13;
 	AppVersion  = '1.00';
 
 Type LongString = UTF8String;
@@ -54,10 +56,13 @@ Type
 	End;
 
 Var
-	packs : BTree;
-	opt_verbose, opt_bsearch : Boolean;
-	opt_names : Boolean;
-	opt_search : String;
+	packs		: BTree;
+	reposlist	: StrList;
+
+	{ CLI parameters }
+	opt_verbose, opt_bsearch, opt_brepo : Boolean;
+	opt_names, opt_repolist : Boolean;
+	opt_search, opt_repo : String;
 
 Constructor PKG.Init(key, filename : String; txt, opts : StrList);
 Begin
@@ -221,9 +226,13 @@ Begin
 							WriteLn('WARNING: The package ', name, ' not found.')
 					End
 					Else Begin
+						if Copy(repo, 1, SPP_SIGN_L) = SPP_SIGN then
+							repo := Copy(repo, SPP_SIGN_L + 1, 255);
 						data := node^.Ptr;
 						data^.Repos.Add(repo);
 						data^.Vers.Add(vers);
+						if NOT reposlist.Contains(repo) then
+							reposlist.Add(repo);
 					End
 				End;
 				v.Clear;
@@ -250,8 +259,15 @@ Var	i : Integer;
 		WriteLn('  -h, --help		Prints this screen and exits.');
 		WriteLn('  -v, --version		Prints the version information and exits.');
 		WriteLn('  -d, --debug		Prints verbose messages.');
-		WriteLn('  -s, --search		Search information about a package. The pattern is in regular expression syntax.');
+		WriteLn('  -s, --search pattern	Search information about a package. #1');
+		WriteLn('  -sd, --search-desc pattern');
+		WriteLn('			Search in descriptions. #1');
 		WriteLn('  -n, --names		Display package names only instead of full information.');
+		WriteLn('  -rl, --repo-list	Display a list of repositories.');
+		WriteLn('  -rp, --repo-pkg-list repo');
+		WriteLn('			Display all packages from the specified repository.');
+		WriteLn;
+		WriteLn('#1: Regular expressions are supported.');
 		Halt(0);
 	End;
 
@@ -291,6 +307,18 @@ Begin
 					Halt(1);
 				End
 			End
+			Else If (opt = '-rl') OR (opt = '--repo-list' ) then
+				opt_repolist := true
+			Else If (opt = '-rp') OR (opt = '--repo-pkg-list') then Begin
+				if ParamCount >= i + 1 then Begin
+					opt_brepo := true;
+					opt_repo := ParamStr(i+1);
+				End
+				Else Begin
+					WriteLn('Error: Missing repository name');
+					Halt(1);
+				End
+			End
 			Else Begin
 				WriteLn('Error: Unknown option ', opt);
 				Halt(1)
@@ -309,7 +337,7 @@ Begin
 	if opt_names then
 		WriteLn(data^.Name)
 	else begin
-		WriteLn('Package      : ', data^.Name);
+		WriteLn('PACKAGE   : ', data^.Name);
 {		WriteLn('Filename     : ', data^.FName); }
 		Write('Repositories : ');
 		data^.Repos.Print(#32);
@@ -321,11 +349,12 @@ Begin
 		WriteLn('Variables    : ');
 		data^.Vars.Print;
 		WriteLn('Description  :');
-		data^.Desc.Print;
+		data^.Desc.Print(#10, #9, true);
 	End
 End;
 
 (*
+ * search for package callback
  *)
 Var re : TRegExpr;
 
@@ -338,10 +367,23 @@ Begin
 End;
 
 (*
+ * print report-list callback
+ *)
+Procedure RepoListProc(node : BTreeNodePtr);
+Var	data : PKGPtr;
+Begin
+	data := node^.Ptr;
+	if data^.Repos.Contains(opt_repo) then
+		PrintPackage(node)
+End;
+
+(*
  * main
  *)
 Begin
 	packs.Init;
+	reposlist.Init;
+	
 	ParseCLIParams;	
 	if ( opt_verbose ) then
 		WriteLn('Loading ', PKGDataFile, ' ...');
@@ -357,11 +399,19 @@ Begin
 				packs.Walk(@SearchProc);
 				re.Free;
 			End;
+			if ( opt_brepo ) then Begin
+				packs.Walk(@RepoListProc);
+			End;
+			if ( opt_repolist ) then Begin
+				reposlist.Print(#10);
+			End;
 		End
 		Else
 			WriteLn('FAILED!');
 	End
 	Else
 		WriteLn('FAILED!');
+
+	reposlist.Free;
 	packs.Free
 End.

@@ -29,6 +29,8 @@ Unit slist;
 
 Interface
 
+Uses SysUtils;
+
 Type
 	StrListNodePtr = ^StrListNode;
 	StrListNode = Record
@@ -60,7 +62,8 @@ Type
 		Procedure	Delete(node : StrListNodePtr);
 		Function	Find(key : String) : StrListNodePtr;
 		Procedure	Walk(UDF : StrListWalkProc);
-		Procedure	Print(delim : String = #10);
+		Procedure	Print(delim : String = #10; prefix : String = ''; beautify : Boolean = false);
+		Function	Contains(str : String) : Boolean;
 
 		Property Count: Integer read nCount;	{ returns the number of nodes in the list }
 		Property Head : StrListNodePtr read pHead;
@@ -224,14 +227,31 @@ End;
 (*
  * Prints the list of the strings.
  *)
-Procedure StrList.Print(delim : String);
+Procedure StrList.Print(delim : String; prefix : String; beautify : Boolean);
 Var cur	: StrListNodePtr;
+	lastln : String;
 Begin
+	lastln := '';
 	cur := pHead;
 	While cur <> NIL do	Begin
-		Write(cur^.Key, delim);
+		if beautify then Begin
+			if lastln = '' then Begin
+				if Length(Trim(cur^.Key)) = 0 then begin
+					cur := cur^.Next;
+					continue
+				End;
+			End;
+					
+			lastln := Trim(cur^.Key);
+			Write(prefix, cur^.Key, delim);
+		End	Else
+			Write(prefix, cur^.Key, delim);
 		cur := cur^.Next;
 	End;
+	if beautify then begin
+		if lastln <> '' then
+			WriteLn;
+	end
 End;
 
 (*
@@ -246,6 +266,17 @@ Begin
 			break;
 		cur := cur^.Next
 	End
+End;
+
+(*
+ * returns true if the list contains the 'str' key
+ *)
+Function StrList.Contains(str : String) : Boolean;
+Begin
+	if Find(str) <> NIL then
+		Contains := true
+	else
+		Contains := false
 End;
 
 (* --- end --- *)
