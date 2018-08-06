@@ -62,7 +62,7 @@ Type
 		Procedure	Delete(node : StrListNodePtr);
 		Function	Find(key : String) : StrListNodePtr;
 		Procedure	Walk(UDF : StrListWalkProc);
-		Procedure	Print(delim : String = #10; prefix : String = ''; beautify : Boolean = false);
+		Procedure	Print(delim : String = #10; prefix : String = '');
 		Function	Contains(str : String) : Boolean;
 
 		Property Count: Integer read nCount;	{ returns the number of nodes in the list }
@@ -227,31 +227,14 @@ End;
 (*
  * Prints the list of the strings.
  *)
-Procedure StrList.Print(delim : String; prefix : String; beautify : Boolean);
+Procedure StrList.Print(delim : String; prefix : String);
 Var cur	: StrListNodePtr;
-	lastln : String;
 Begin
-	lastln := '';
 	cur := pHead;
 	While cur <> NIL do	Begin
-		if beautify then Begin
-			if lastln = '' then Begin
-				if Length(Trim(cur^.Key)) = 0 then begin
-					cur := cur^.Next;
-					continue
-				End;
-			End;
-					
-			lastln := Trim(cur^.Key);
-			Write(prefix, cur^.Key, delim);
-		End	Else
-			Write(prefix, cur^.Key, delim);
-		cur := cur^.Next;
-	End;
-	if beautify then begin
-		if lastln <> '' then
-			WriteLn;
-	end
+		Write(prefix, cur^.Key, delim);
+		cur := cur^.Next
+	End
 End;
 
 (*

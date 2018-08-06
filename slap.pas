@@ -359,7 +359,7 @@ Begin
 		WriteLn('Variables    : ');
 		data^.Vars.Print;
 		WriteLn('Description  :');
-		data^.Desc.Print(#10, #9, true);
+		data^.Desc.Walk(@PrintDesc);
 	End
 End;
 
