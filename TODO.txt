@@ -1,10 +1,8 @@
 * load files of each package
-* -sf find file
+* -sf search for file
 * load 'installed' and display status
-* -li get list of installed packages
-* -lu get the list of non-installed packages
-* -la get the list of all packages
-* -sa/-si/-su search in list of all, installed or non-installed only.
+* -la/-li/-lu get list of all, installed or non-installed packages
+* -la/-li/-lu combined with -s[x] (flag for search) search in list of all, installed or non-installed only.
 * separate slackware code from CLI code, needed for GUI
 * GUI APP
 
