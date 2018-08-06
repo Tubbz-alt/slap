@@ -7,7 +7,5 @@ I intent to add GUI too (that is why I wrote in PASCAL);
 export to SQL script;
 and more...
 
-Use
-	slap -h
-for help
+Use `slap -h` for help
 
