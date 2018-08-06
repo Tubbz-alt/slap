@@ -31,5 +31,10 @@ release:
 	@-rm *.{bak,o,ppu,map} slap >& /dev/null
 	$(PC) $(PCFLAGS_RELEASE) slap.pas
 
+push:
+	git add .
+	git commit -m "auto"
+	git push
+
 install:
 	install -m 755 -o root -g root slap $(instdir)
