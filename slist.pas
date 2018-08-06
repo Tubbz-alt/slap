@@ -64,13 +64,27 @@ Type
 		Procedure	Walk(UDF : StrListWalkProc);
 		Procedure	Print(delim : String = #10; prefix : String = '');
 		Function	Contains(str : String) : Boolean;
-
-		Property Count: Integer read nCount;	{ returns the number of nodes in the list }
-		Property Head : StrListNodePtr read pHead;
-		Property Tail : StrListNodePtr read pTail;
+		Function	Count : Integer; inline;
+		Function	Head  : StrListNodePtr; inline;
 	End;
 
 Implementation
+
+(*
+ * Returns the number of nodes in the list.
+ *)
+Function StrList.Count : Integer; inline;
+Begin
+	Count := nCount;
+End;
+
+(*
+ * Returns the head pointer
+ *)
+Function StrList.Head  : StrListNodePtr; inline;
+Begin
+	Head := pHead;
+End;
 
 (*
  * Initialize the list.
