@@ -367,12 +367,12 @@ End;
  * search for package callback
  *)
 Var re : TRegExpr;
-	desc : LongString;
+	ls_desc : LongString;
 
-Function BuildDescString(node : StrListNodePtr) : StrListWalkResult;
+Function BuildDescString(slnode : StrListNodePtr) : StrListWalkResult;
 Begin
-	desc := Concat(desc, node^.Key);
-	BuildDescString := slContinue;
+	ls_desc := Concat(ls_desc, slnode^.Key);
+	BuildDescString := slContinue
 End;
 
 Procedure SearchProc(node : BTreeNodePtr);
@@ -387,12 +387,12 @@ Procedure SearchDescProc(node : BTreeNodePtr);
 Var	data : PKGPtr;
 Begin
 	data := node^.Ptr;
-	desc := '';
-	data^.Repos.Walk(@BuildDescString);
+	ls_desc := '';
+	data^.desc.Walk(@BuildDescString);
 	if re.Exec(node^.Key) then
 		PrintPackage(node)
-	else if re.Exec(desc) then
-		PrintPackage(node)
+	else if re.Exec(ls_desc) then
+		PrintPackage(node);
 End;
 
 (*
@@ -428,7 +428,7 @@ Begin
 				packs.Walk(@SearchProc);
 				re.Free;
 			End ELSE if ( opt_desc_bsearch ) then Begin
-				re := TRegExpr.Create(Concat('^', opt_desc_search));
+				re := TRegExpr.Create(opt_desc_search);
 				packs.Walk(@SearchDescProc);
 				re.Free;
 			End ELSE if ( opt_brepo ) then Begin
