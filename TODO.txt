@@ -5,4 +5,6 @@
 * -lu get the list of non-installed packages
 * -la get the list of all packages
 * -sa/-si/-su search in list of all, installed or non-installed only.
-* gui
+* separate slackware code from CLI code, needed for GUI
+* GUI APP
+
