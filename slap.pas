@@ -263,8 +263,8 @@ Var	i : Integer;
 		WriteLn('  -sd, --search-desc pattern');
 		WriteLn('			Search in descriptions. (1)');
 		WriteLn('  -n, --names		Display package names only instead of full information.');
-		WriteLn('  -rl, --repo-list	Display a list of repositories.');
-		WriteLn('  -rp, --repo-pkg-list repo');
+		WriteLn('  -lr, --list-repos	Display a list of repositories.');
+		WriteLn('  -lrp, --list-repo-pkgs repo');
 		WriteLn('			Display all packages from the specified repository.');
 		WriteLn;
 		WriteLn('(1): Regular expressions are supported.');
@@ -317,9 +317,9 @@ Begin
 					Halt(1);
 				End
 			End
-			Else If (opt = '-rl') OR (opt = '--repo-list' ) then
+			Else If (opt = '-lr') OR (opt = '--list-repos' ) then
 				opt_repolist := true
-			Else If (opt = '-rp') OR (opt = '--repo-pkg-list') then Begin
+			Else If (opt = '-lrp') OR (opt = '--list-repo-pkgs') then Begin
 				if ParamCount >= i + 1 then Begin
 					opt_brepo := true;
 					opt_repo := ParamStr(i+1);

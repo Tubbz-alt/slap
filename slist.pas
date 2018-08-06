@@ -63,7 +63,6 @@ Type
 		Function	Find(key : String) : StrListNodePtr;
 		Procedure	Walk(UDF : StrListWalkProc);
 		Procedure	Print(delim : String = #10; prefix : String = '');
-		Function	Contains(str : String) : Boolean;
 		Function	Count : Integer; inline;
 		Function	Head  : StrListNodePtr; inline;
 	End;
@@ -72,7 +71,10 @@ Operator in (const A: String; const B: StrList) : Boolean;
 
 Implementation
 
-Operator IN (const A : String; const B : StrList) : Boolean;  
+(*
+ * returns true if the list contains the 'A' key
+ *)
+Operator in (const A : String; const B : StrList) : Boolean;  
 Begin  
 	Result := (B.Find(A) <> NIL)
 End;
@@ -270,17 +272,6 @@ Begin
 			break;
 		cur := cur^.Next
 	End
-End;
-
-(*
- * returns true if the list contains the 'str' key
- *)
-Function StrList.Contains(str : String) : Boolean;
-Begin
-	if Find(str) <> NIL then
-		Contains := true
-	else
-		Contains := false
 End;
 
 (* --- end --- *)
