@@ -1,1 +1,3 @@
 # slap
+
+Slackware package explorer

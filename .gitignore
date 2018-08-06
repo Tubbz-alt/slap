@@ -1,0 +1,16 @@
+*.o
+*~
+*.bak
+*.gz
+*.tgz
+*.zip
+*.bz2
+*.xz
+*.old
+*.prev
+*.log
+*.out
+*.ppu
+o/*
+obj/*
+objs/*
