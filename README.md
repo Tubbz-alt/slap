@@ -9,7 +9,7 @@ and more...
 
 What it does until now:
 
-* Supports (slackpkg+)[http://slakfinder.org/slackpkg+.html]
+* Supports slackpkg and [slackpkg+](http://slakfinder.org/slackpkg+.html)
 * Loads all package information into binary tree
 * Searchs by using regular expressions (PCRE)
 
