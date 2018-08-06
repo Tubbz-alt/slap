@@ -389,7 +389,9 @@ Begin
 	data := node^.Ptr;
 	desc := '';
 	data^.Repos.Walk(@BuildDescString);
-	if re.Exec(desc) then
+	if re.Exec(node^.Key) then
+		PrintPackage(node)
+	else if re.Exec(desc) then
 		PrintPackage(node)
 End;
 
