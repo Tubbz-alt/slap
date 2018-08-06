@@ -60,9 +60,9 @@ Var
 	reposlist	: StrList;
 
 	{ CLI parameters }
-	opt_verbose, opt_bsearch, opt_brepo : Boolean;
+	opt_verbose, opt_bsearch, opt_desc_bsearch, opt_brepo : Boolean;
 	opt_names, opt_repolist : Boolean;
-	opt_search, opt_repo : String;
+	opt_search, opt_desc_search, opt_repo : String;
 
 Constructor PKG.Init(key, filename : String; txt, opts : StrList);
 Begin
@@ -259,15 +259,15 @@ Var	i : Integer;
 		WriteLn('  -h, --help		Prints this screen and exits.');
 		WriteLn('  -v, --version		Prints the version information and exits.');
 		WriteLn('  -d, --debug		Prints verbose messages.');
-		WriteLn('  -s, --search pattern	Search information about a package. #1');
+		WriteLn('  -s, --search pattern	Search information about a package. (1)');
 		WriteLn('  -sd, --search-desc pattern');
-		WriteLn('			Search in descriptions. #1');
+		WriteLn('			Search in descriptions. (1)');
 		WriteLn('  -n, --names		Display package names only instead of full information.');
 		WriteLn('  -rl, --repo-list	Display a list of repositories.');
 		WriteLn('  -rp, --repo-pkg-list repo');
 		WriteLn('			Display all packages from the specified repository.');
 		WriteLn;
-		WriteLn('#1: Regular expressions are supported.');
+		WriteLn('(1): Regular expressions are supported.');
 		Halt(0);
 	End;
 
@@ -301,6 +301,16 @@ Begin
 				if ParamCount >= i + 1 then Begin
 					opt_bsearch := true;
 					opt_search := ParamStr(i+1);
+				End
+				Else Begin
+					WriteLn('Error: Missing search pattern');
+					Halt(1);
+				End
+			End
+			Else If (opt = '-sd') OR (opt = '--search-desc') then Begin
+				if ParamCount >= i + 1 then Begin
+					opt_desc_bsearch := true;
+					opt_desc_search := ParamStr(i+1);
 				End
 				Else Begin
 					WriteLn('Error: Missing search pattern');
@@ -357,12 +367,29 @@ End;
  * search for package callback
  *)
 Var re : TRegExpr;
+	desc : LongString;
+
+Function BuildDescString(node : StrListNodePtr) : StrListWalkResult;
+Begin
+	desc := Concat(desc, node^.Key);
+	BuildDescString := slContinue;
+End;
 
 Procedure SearchProc(node : BTreeNodePtr);
 Begin
 	if node^.Key = opt_search then
 		PrintPackage(node)
 	else if re.Exec(node^.Key) then
+		PrintPackage(node)
+End;
+
+Procedure SearchDescProc(node : BTreeNodePtr);
+Var	data : PKGPtr;
+Begin
+	data := node^.Ptr;
+	desc := '';
+	data^.Repos.Walk(@BuildDescString);
+	if re.Exec(desc) then
 		PrintPackage(node)
 End;
 
@@ -398,11 +425,13 @@ Begin
 				re := TRegExpr.Create(Concat('^', opt_search));
 				packs.Walk(@SearchProc);
 				re.Free;
-			End;
-			if ( opt_brepo ) then Begin
+			End ELSE if ( opt_desc_bsearch ) then Begin
+				re := TRegExpr.Create(Concat('^', opt_desc_search));
+				packs.Walk(@SearchDescProc);
+				re.Free;
+			End ELSE if ( opt_brepo ) then Begin
 				packs.Walk(@RepoListProc);
-			End;
-			if ( opt_repolist ) then Begin
+			End ELSE if ( opt_repolist ) then Begin
 				reposlist.Print(#10);
 			End;
 		End
