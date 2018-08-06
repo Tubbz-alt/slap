@@ -68,8 +68,15 @@ Type
 		Function	Head  : StrListNodePtr; inline;
 	End;
 
+Operator in (const A: String; const B: StrList) : Boolean;
+
 Implementation
 
+Operator IN (const A : String; const B : StrList) : Boolean;  
+Begin  
+	Result := (B.Find(A) <> NIL)
+End;
+  
 (*
  * Returns the number of nodes in the list.
  *)

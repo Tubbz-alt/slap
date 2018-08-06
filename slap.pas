@@ -231,7 +231,7 @@ Begin
 						data := node^.Ptr;
 						data^.Repos.Add(repo);
 						data^.Vers.Add(vers);
-						if NOT reposlist.Contains(repo) then
+						if NOT (repo IN reposlist) then
 							reposlist.Add(repo);
 					End
 				End;
@@ -422,7 +422,7 @@ Procedure RepoListProc(node : BTreeNodePtr);
 Var	data : PKGPtr;
 Begin
 	data := node^.Ptr;
-	if data^.Repos.Contains(opt_repo) then
+	if opt_repo in data^.Repos then
 		PrintPackage(node)
 End;
 
