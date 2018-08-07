@@ -21,6 +21,9 @@ sbtree.ppu: sbtree.pas
 slist.ppu: slist.pas
 	$(PC) $(PCFLAGS) slist.pas
 
+slackpack.ppu: slackpack.pas
+	$(PC) $(PCFLAGS) slackpack.pas
+
 slap: slap.pas sbtree.ppu slist.ppu
 	$(PC) $(PCFLAGS) slap.pas
 
