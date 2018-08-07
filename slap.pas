@@ -33,12 +33,12 @@ Uses SysUtils, SBTree, SList, Slackpack, RegExpr;
 Const
 	AppVersion  = '1.00';
 
-Type LongString = UTF8String;
+Type
+	LongString = UTF8String;
 
 Var
 	pdb : SlackwarePDB;
 
-	{ CLI parameters }
 	opt_verbose, opt_bsearch, opt_desc_bsearch, opt_brepo : Boolean;
 	opt_names, opt_repolist : Boolean;
 	opt_search, opt_desc_search, opt_repo : String;
@@ -247,5 +247,5 @@ Begin
 		pdb.reposlist.Print(#10);
 	End;
 
-	pdb.Free
+	pdb.Free;
 End.

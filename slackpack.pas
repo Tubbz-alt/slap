@@ -34,7 +34,7 @@ Uses SysUtils, SBTree, SList, RegExpr;
 Type LongString = UTF8String;
 
 Const
-	PKGDataDir  = '/var/lib/slackpkg';
+	PKGDataDir  = '/var/log/packages';
 	PKGDataFile = '/var/lib/slackpkg/PACKAGES.TXT';
 	REPDataFile = '/var/lib/slackpkg/pkglist';
 	SPP_SIGN    = 'SLACKPKGPLUS_';
@@ -50,6 +50,7 @@ Type
 		Vars  : StrList;
 		Repos : StrList;
 		Vers  : StrList;
+		bInst : Boolean;
 		
 		Constructor Init(key, filename : String; txt, opts : StrList);
 		Destructor  Free; virtual;
@@ -57,10 +58,13 @@ Type
 
 Type
 	SlackwarePDB = Object
-	public
-		packs		: BTree;
-		reposlist	: StrList;
+	private
 		verbose		: Boolean;
+
+	public
+		packs		: BTree;	{ package db }
+		reposlist	: StrList;	{ repository list }
+		instlist	: StrList;	{ installed packages }
 		
 		Constructor Init(debmsgs : Boolean = false);
 		Destructor  Free; virtual;
@@ -78,6 +82,7 @@ Implementation
  *)
 Constructor PKG.Init(key, filename : String; txt, opts : StrList);
 Begin
+	bInst := false;
 	Name  := key;
 	FName := filename;
 	Desc.Copy(txt);
@@ -105,20 +110,21 @@ Begin
 	verbose := debmsgs;
 
 	reposlist.Init;
+	instlist.Init;
 	packs.Init;
 	
-	if ( verbose ) then
+	if verbose then
 		WriteLn('Loading ', PKGDataFile, ' ...');
 	If LoadDataFile then Begin
-		if ( verbose ) then
+		if verbose then
 			WriteLn('Loading ', REPDataFile, ' ...');
 		If LoadRepoDataFile then Begin
-			if ( verbose ) then
+			if verbose then
 				WriteLn('* DONE *');
 		End	Else
-			WriteLn('FAILED!');
+			WriteLn(REPDataFile, ' FAILED!');
 	End	Else
-		WriteLn('FAILED!');
+		WriteLn(PKGDataFile, ' FAILED!');
 End;
 
 (*
@@ -127,7 +133,9 @@ End;
 Destructor SlackwarePDB.Free;
 Begin
 	packs.Free;
+	instlist.Free;
 	reposlist.Free;
+	inherited;
 End;
 
 (*
@@ -201,7 +209,7 @@ Begin
 						{ store data }
 						node := packs.Find(pkg_name);
 						If node = NIL then
-							packs.Insert(pkg_name, New(PKGPtr, init(pkg_name, pkg_fname, pkg_desc, pkg_opts)) )
+							packs.Insert(pkg_name, New(PKGPtr, Init(pkg_name, pkg_fname, pkg_desc, pkg_opts)))
 						Else Begin
 							data := node^.Ptr;
 							if ( verbose ) then

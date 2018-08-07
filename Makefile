@@ -24,7 +24,7 @@ slist.ppu: slist.pas
 slackpack.ppu: slackpack.pas
 	$(PC) $(PCFLAGS) slackpack.pas
 
-slap: slap.pas sbtree.ppu slist.ppu
+slap: slap.pas sbtree.ppu slist.ppu slackpack.ppu
 	$(PC) $(PCFLAGS) slap.pas
 
 clean:
