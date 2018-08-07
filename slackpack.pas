@@ -65,13 +65,17 @@ Type
 		packs		: BTree;	{ package db }
 		reposlist	: StrList;	{ repository list }
 		instlist	: StrList;	{ installed packages }
-		
-		Constructor Init(debmsgs : Boolean = false);
-		Destructor  Free; virtual;
-		
+
+	private
+		Procedure	GetFileList(var lst : StrList; dirx : String; pattern : String = '*');
 		Procedure	Split(str : String; delim : String; Var v : StrList);
 		Function	LoadDataFile : Boolean;
 		Function	LoadRepoDataFile : Boolean;
+		Function	IsDigit(ch : Char) : Boolean;
+
+	public
+		Constructor Init(debmsgs : Boolean = false);
+		Destructor  Free; virtual;		
 	End;
 
 (* --- *)
@@ -103,9 +107,21 @@ Begin
 End;
 
 (*
+ *)
+Function SlackwarePDB.IsDigit(ch : Char) : Boolean;
+Begin
+	IsDigit := ((ch >= #48) and (ch <= #57))
+End;
+
+(*
  * Initialize package database
  *)
 Constructor SlackwarePDB.Init(debmsgs : Boolean);
+Var	cur		: StrListNodePtr;
+	node	: BTreeNodePtr;
+	data	: PKGPtr;
+	name, buf : String;
+	lastidx, idx  : Integer;
 Begin
 	verbose := debmsgs;
 
@@ -119,6 +135,39 @@ Begin
 		if verbose then
 			WriteLn('Loading ', REPDataFile, ' ...');
 		If LoadRepoDataFile then Begin
+			{ mark installed packages }
+			GetFileList(instlist, PKGDataDir);
+			cur := instlist.Head;
+			while cur <> NIL do begin
+
+				buf  := cur^.Key;
+				name := buf;
+				lastidx := 0;
+
+				Repeat
+					idx  := Pos(#45, buf);
+					if (IsDigit(buf[1])) and (lastidx > 0) then
+						break;
+					lastidx := lastidx + idx;
+					buf := Copy(buf, idx + 1, 255);
+				Until idx = 0;
+				
+				if lastidx > 0 then
+					name := Copy(name, 1, lastidx - 1)
+				else
+					name := buf;
+				
+				node := packs.Find(name);
+				if node = NIL then
+					WriteLn('Installed package ', name, ' not found in PDB.')
+					{ add this package }
+				else Begin
+					data := node^.Ptr;
+					data^.bInst := true;
+				End;
+				cur := cur^.Next;
+			end;
+			{ done }
 			if verbose then
 				WriteLn('* DONE *');
 		End	Else
@@ -298,6 +347,27 @@ Begin
 		End
 	End
 End;
+
+(*
+ * Get all filenames of directory
+ *)
+Procedure SlackwarePDB.GetFileList(var lst : StrList; dirx : String; pattern : String);
+Var	Info : TSearchRec;
+	prevDir : String;
+Begin
+	prevDir := GetCurrentDir;
+	SetCurrentDir(dirx);
+	If FindFirst(pattern, faAnyFile AND faReadOnly, Info) = 0 then
+	Begin
+		Repeat
+			lst.push(Info.Name);
+		Until FindNext(info)<>0;
+	End;
+	FindClose(Info);
+	SetCurrentDir(prevDir);
+End;
+
+End.
 
 (* --- *)
 END.
