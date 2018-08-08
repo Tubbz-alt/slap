@@ -107,6 +107,7 @@ Begin
 End;
 
 (*
+ * Returns true if the ch is a decimal digit
  *)
 Function SlackwarePDB.IsDigit(ch : Char) : Boolean;
 Begin
@@ -184,7 +185,6 @@ Begin
 	packs.Free;
 	instlist.Free;
 	reposlist.Free;
-	inherited;
 End;
 
 (*
@@ -366,8 +366,6 @@ Begin
 	FindClose(Info);
 	SetCurrentDir(prevDir);
 End;
-
-End.
 
 (* --- *)
 END.

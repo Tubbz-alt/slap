@@ -40,7 +40,7 @@ Var
 	pdb : SlackwarePDB;
 
 	opt_verbose, opt_bsearch, opt_desc_bsearch, opt_brepo : Boolean;
-	opt_names, opt_repolist : Boolean;
+	opt_names, opt_repolist, opt_list_inst, opt_list_uninst : Boolean;
 	opt_search, opt_desc_search, opt_repo : String;
 
 (*
@@ -63,11 +63,15 @@ Var	i : Integer;
 		WriteLn('  -sd, --search-desc pattern');
 		WriteLn('			Search in descriptions. (1)');
 		WriteLn('  -n, --names		Display package names only instead of full information.');
-		WriteLn('  -lr, --list-repos	Display a list of repositories.');
-		WriteLn('  -lrp, --list-repo-pkgs repo');
-		WriteLn('			Display all packages from the specified repository.');
+		WriteLn('  -r, --repos	Display a list of repositories.');
+		WriteLn('  -lr, --list-repo repo');
+		WriteLn('			Display or searches the packages of the specified repository.');
+		WriteLn('  -li, --list-installed	Display or searches the list of installed packages.');
+		WriteLn('  -lu, --list-uninstalled');
+		WriteLn('			Display or searches the list of uninstalled packages.');
 		WriteLn;
-		WriteLn('(1): Regular expressions are supported.');
+		WriteLn(' (1): Regular expressions are supported.');
+		WriteLn('Note: The list (-l*) options can combined with search (-s*) options.');
 		Halt(0);
 	End;
 
@@ -117,9 +121,13 @@ Begin
 					Halt(1);
 				End
 			End
-			Else If (opt = '-lr') OR (opt = '--list-repos' ) then
+			Else If (opt = '-li') OR (opt = '--list-installed' ) then
+				opt_list_inst := true
+			Else If (opt = '-lu') OR (opt = '--list-uninstalled' ) then
+				opt_list_uninst := true
+			Else If (opt = '-r') OR (opt = '--repos' ) then
 				opt_repolist := true
-			Else If (opt = '-lrp') OR (opt = '--list-repo-pkgs') then Begin
+			Else If (opt = '-lr') OR (opt = '--list-repo') then Begin
 				if ParamCount >= i + 1 then Begin
 					opt_brepo := true;
 					opt_repo := ParamStr(i+1);
@@ -163,7 +171,11 @@ Begin
 	if opt_names then
 		WriteLn(data^.Name)
 	else begin
-		WriteLn('PACKAGE      : ', data^.Name);
+		Write('PACKAGE      : ', data^.Name);
+		if data^.bInst then
+			WriteLn(#9, '(installed)')
+		else
+			WriteLn(#9, '(uninstalled)');
 {		WriteLn('Filename     : ', data^.FName); }
 		Write('Repositories : ');
 		data^.Repos.Print(#32);
@@ -196,10 +208,14 @@ Begin
 End;
 
 Procedure SearchProc(node : BTreeNodePtr);
+Var	data : PKGPtr;
 Begin
+	data := node^.Ptr;
+	if (opt_list_inst) and (NOT data^.bInst) then exit;
+	if (opt_list_uninst) and (data^.bInst) then exit;
 	if node^.Key = opt_search then
 		PrintPackage(node)
-	else if re.Exec(node^.Key) then
+	else if (re<>NIL) AND (re.Exec(node^.Key)) then
 		PrintPackage(node)
 End;
 
@@ -207,11 +223,13 @@ Procedure SearchDescProc(node : BTreeNodePtr);
 Var	data : PKGPtr;
 Begin
 	data := node^.Ptr;
+	if (opt_list_inst) and (NOT data^.bInst) then exit;
+	if (opt_list_uninst) and (data^.bInst) then exit;
 	ls_desc := '';
 	data^.desc.Walk(@BuildDescString);
-	if re.Exec(node^.Key) then
+	if (re<>NIL) AND (re.Exec(node^.Key)) then
 		PrintPackage(node)
-	else if re.Exec(ls_desc) then
+	else if (re<>NIL) AND (re.Exec(ls_desc)) then
 		PrintPackage(node);
 End;
 
@@ -222,6 +240,8 @@ Procedure RepoListProc(node : BTreeNodePtr);
 Var	data : PKGPtr;
 Begin
 	data := node^.Ptr;
+	if (opt_list_inst) and (NOT data^.bInst) then exit;
+	if (opt_list_uninst) and (data^.bInst) then exit;
 	if opt_repo in data^.Repos then
 		PrintPackage(node)
 End;
@@ -245,6 +265,12 @@ Begin
 		pdb.packs.Walk(@RepoListProc);
 	End ELSE if ( opt_repolist ) then Begin
 		pdb.reposlist.Print(#10);
+	End ELSE if ( opt_list_inst ) then Begin
+		re := NIL;
+		pdb.packs.Walk(@SearchProc);
+	End ELSE if ( opt_list_uninst ) then Begin
+		re := NIL;
+		pdb.packs.Walk(@SearchProc);
 	End;
 
 	pdb.Free;
