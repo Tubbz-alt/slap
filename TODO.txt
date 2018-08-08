@@ -1,7 +1,8 @@
 * load files of each package
 * -sf search for file
-* add support for sbopkg
+* add support for slackbuilds (sbopkg)
+* export to SQL
 * GUI APP
 
-Additional:
+Additional, Hacks:
 * install older binary package without upgrade

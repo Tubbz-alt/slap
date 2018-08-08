@@ -63,7 +63,7 @@ Var	i : Integer;
 		WriteLn('  -sd, --search-desc pattern');
 		WriteLn('			Search in descriptions. (1)');
 		WriteLn('  -n, --names		Display package names only instead of full information.');
-		WriteLn('  -r, --repos	Display a list of repositories.');
+		WriteLn('  -r, --repos		Display a list of repositories.');
 		WriteLn('  -lr, --list-repo repo');
 		WriteLn('			Display or searches the packages of the specified repository.');
 		WriteLn('  -li, --list-installed	Display or searches the list of installed packages.');
