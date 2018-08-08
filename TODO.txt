@@ -1,9 +1,6 @@
 * load files of each package
 * -sf search for file
-* load 'installed' and display status
-* -la/-li/-lu get list of all, installed or non-installed packages
-* -la/-li/-lu combined with -s[x] (flag for search) search in list of all, installed or non-installed only.
-* add the -s capability to -lr and -lrp
+* add support for sbopkg
 * GUI APP
 
 Additional:
