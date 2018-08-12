@@ -42,21 +42,29 @@ Const
 
 Type
 	PKGPtr = ^PKG;
+
+	(*
+	 * PACKAGE information
+	 *)
 	PKG = Object
 	public
-		Name  : String;
-		FName : String;
-		Desc  : StrList;
-		Vars  : StrList;
-		Repos : StrList;
-		Vers  : StrList;
-		bInst : Boolean;
+		Name  : String;		{ Name }
+		FName : String;		{ File-name }
+		Desc  : StrList;	{ multi-line description }
+		Vars  : StrList;	{ other variables }
+		Repos : StrList;	{ list of repositories }
+		Vers  : StrList;	{ list of versions on repositories }
+		bInst : Boolean;	{ true if it is installed }
 		
-		Constructor Init(key, filename : String; txt, opts : StrList);
+		Constructor Init(key, filename : String);
+		Constructor Init2(key, filename : String; txt, opts : StrList);
 		Destructor  Free; virtual;
 	End;
 
 Type
+	(*
+	 * Slackware Package DataBase 
+	 *)
 	SlackwarePDB = Object
 	private
 		verbose		: Boolean;
@@ -69,9 +77,11 @@ Type
 	private
 		Procedure	GetFileList(var lst : StrList; dirx : String; pattern : String = '*');
 		Procedure	Split(str : String; delim : String; Var v : StrList);
-		Function	LoadDataFile : Boolean;
+		Procedure	LoadPackageList; { /var/log/packages }
+		Function	LoadPACKAGESFile : Boolean;
 		Function	LoadRepoDataFile : Boolean;
 		Function	IsDigit(ch : Char) : Boolean;
+		Function	GetShortName(fileName : String) : String;
 
 	public
 		Constructor Init(debmsgs : Boolean = false);
@@ -84,13 +94,24 @@ Implementation
 (*
  * Initialize package information object
  *)
-Constructor PKG.Init(key, filename : String; txt, opts : StrList);
+Constructor PKG.Init2(key, filename : String; txt, opts : StrList);
 Begin
 	bInst := false;
 	Name  := key;
 	FName := filename;
 	Desc.Copy(txt);
 	Vars.Copy(opts);
+	Repos.Init;
+	Vers.Init;
+End;
+
+Constructor PKG.Init(key, filename : String);
+Begin
+	bInst := false;
+	Name  := key;
+	FName := filename;
+	Desc.Init;
+	Vars.Init;
 	Repos.Init;
 	Vers.Init;
 End;
@@ -115,14 +136,67 @@ Begin
 End;
 
 (*
+ * Returns the package name from a package fileName
+ *)
+Function SlackwarePDB.GetShortName(fileName : String) : String;
+Var	buf, name : String;
+	idx, lastidx : Integer;
+Begin
+	buf  := fileName;
+	name := buf;
+	lastidx := 0;
+
+	Repeat
+		idx  := Pos(#45, buf);
+		if (IsDigit(buf[1])) and (lastidx > 0) then Begin
+//			if IsVerStr(buf) then
+				break;
+			End;
+		lastidx := lastidx + idx;
+		buf := Copy(buf, idx + 1, 255);
+	Until idx = 0;
+				
+	if lastidx > 0 then
+		name := Copy(name, 1, lastidx - 1)
+	else
+		name := buf;
+	
+	GetShortName := name;
+End;
+
+(*
+ * Load every package from /var/log/packages
+ *)
+Procedure SlackwarePDB.LoadPackageList;
+Var	fileList : StrList;
+	name	: String;
+	cur		: StrListNodePtr;
+	node	: BTreeNodePtr;
+Begin
+	fileList.Init;
+	GetFileList(fileList, PKGDataDir);
+
+	cur := fileList.Head;
+	While cur <> NIL do Begin
+		name := GetShortName(cur^.Key);
+		node := packs.Find(name);
+		if node <> NIL then Begin
+			if verbose then
+				WriteLn(PKGDataDir, ': Installed package ', name, ' already found in PDB!');
+		End Else Begin
+			node := packs.Insert(name, New(PKGPtr, Init(name, cur^.Key)));
+			PKGPtr(node^.Ptr)^.bInst := true;
+//			LoadPackageDataFile(node^.fname, node);			
+		End;
+		cur := cur^.Next;
+	End; { While }
+	fileList.Free;
+End;
+
+(*
  * Initialize package database
  *)
 Constructor SlackwarePDB.Init(debmsgs : Boolean);
-Var	cur		: StrListNodePtr;
-	node	: BTreeNodePtr;
-	data	: PKGPtr;
-	name, buf : String;
-	lastidx, idx  : Integer;
 Begin
 	verbose := debmsgs;
 
@@ -132,42 +206,11 @@ Begin
 	
 	if verbose then
 		WriteLn('Loading ', PKGDataFile, ' ...');
-	If LoadDataFile then Begin
+	LoadPackageList;
+	If LoadPACKAGESFile then Begin
 		if verbose then
 			WriteLn('Loading ', REPDataFile, ' ...');
 		If LoadRepoDataFile then Begin
-			{ mark installed packages }
-			GetFileList(instlist, PKGDataDir);
-			cur := instlist.Head;
-			while cur <> NIL do begin
-
-				buf  := cur^.Key;
-				name := buf;
-				lastidx := 0;
-
-				Repeat
-					idx  := Pos(#45, buf);
-					if (IsDigit(buf[1])) and (lastidx > 0) then
-						break;
-					lastidx := lastidx + idx;
-					buf := Copy(buf, idx + 1, 255);
-				Until idx = 0;
-				
-				if lastidx > 0 then
-					name := Copy(name, 1, lastidx - 1)
-				else
-					name := buf;
-				
-				node := packs.Find(name);
-				if node = NIL then
-					WriteLn('Installed package ', name, ' not found in PDB.')
-					{ add this package }
-				else Begin
-					data := node^.Ptr;
-					data^.bInst := true;
-				End;
-				cur := cur^.Next;
-			end;
 			{ done }
 			if verbose then
 				WriteLn('* DONE *');
@@ -190,7 +233,7 @@ End;
 (*
  *  Load packages information into the memory
  *)
-Function SlackwarePDB.LoadDataFile : Boolean;
+Function SlackwarePDB.LoadPACKAGESFile : Boolean;
 Var
 	tf : TextFile;
 	buf, key, txt, wrd, pkg_name, pkg_fname : String;
@@ -203,7 +246,7 @@ Var
 Begin
 	pkg_desc.Init;
 	pkg_opts.Init;
-	LoadDataFile := False;
+	LoadPACKAGESFile := False;
 	If FileExists(PKGDataFile) then Begin
 		Assign(tf, PKGDataFile);
 		{$I-}Reset(tf);{$I+}
@@ -225,11 +268,11 @@ Begin
 							pkg_name := '';
 							pkg_fname := Trim(Copy(buf, idx + 1, 255));
 							pkg_desc.Clear;
-						End
-					End
-					Else
+						End;
+					End Else Begin
 						Continue
-					End;
+					End
+				End;
 
 				{ if recording is enabled }
 				If recBlock then Begin
@@ -246,29 +289,26 @@ Begin
 									wrd := 'USIZE';
 								pkg_opts.Add(Concat(wrd, '=', txt));
 							End
-						End
-						Else Begin
+						End Else Begin
 							pkg_name := key;
 							pkg_desc.Add(txt);
 						End
-					End
-					Else { line has no keyword }
-					Begin
+					End Else Begin
 						recBlock := false;
 						{ store data }
 						node := packs.Find(pkg_name);
 						If node = NIL then
-							packs.Insert(pkg_name, New(PKGPtr, Init(pkg_name, pkg_fname, pkg_desc, pkg_opts)))
+							packs.Insert(pkg_name, New(PKGPtr, Init2(pkg_name, pkg_fname, pkg_desc, pkg_opts)))
 						Else Begin
 							data := node^.Ptr;
-							if ( verbose ) then
-								WriteLn('WARNING: Package ', data^.FName, ' found again as ', pkg_fname);
-						End 
+							data^.Desc.Assign(pkg_desc);
+							data^.Vars.Assign(pkg_opts);
+						End
 					End
 				End
-			End;
-			Close(tf);			
-			LoadDataFile := True
+			End; { While }
+			Close(tf);
+			LoadPACKAGESFile := True;
 		End
 	End
 End;

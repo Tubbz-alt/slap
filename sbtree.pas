@@ -54,7 +54,7 @@ Type
 		Constructor	Init;
 		Destructor	Free; virtual;
 		Procedure	Clear;
-		Procedure	Insert(key : String; data : Pointer);
+		Function	Insert(key : String; data : Pointer) : BTreeNodePtr;
 		Function	Find(key : String) : BTreeNodePtr;
 		Procedure	Walk(UDP : BTreeWalkProc; order : BTreeTraversal = btInorder);
 	End;
@@ -95,7 +95,7 @@ End;
 (*
  * Add a new node in the tree
  *)
-Procedure BTree.Insert(key : String; data : Pointer);
+Function BTree.Insert(key : String; data : Pointer) : BTreeNodePtr;
 Var	cur, pre, node : BTreeNodePtr;
 Begin
 	{ create a new node }
@@ -125,7 +125,8 @@ Begin
 			pre^.Right := node
 	End
 	Else
-		root := node
+		root := node;
+	Insert := node;
 End;
 
 (*
