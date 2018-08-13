@@ -78,9 +78,11 @@ Type
 		Procedure	GetFileList(var lst : StrList; dirx : String; pattern : String = '*');
 		Procedure	Split(str : String; delim : String; Var v : StrList);
 		Procedure	LoadPackageList; { /var/log/packages }
+		Procedure	LoadPackageDataFile(fname : String; var data : PKGPtr);
 		Function	LoadPACKAGESFile : Boolean;
 		Function	LoadRepoDataFile : Boolean;
 		Function	IsDigit(ch : Char) : Boolean;
+		Function	IsVerStr(s : String) : Boolean;
 		Function	GetShortName(fileName : String) : String;
 
 	public
@@ -136,6 +138,26 @@ Begin
 End;
 
 (*
+ * Returns true if the string (until the end or '-') its seems to be version string
+ *)
+Function SlackwarePDB.IsVerStr(s : String) : Boolean;
+Var	i, l : Integer;
+Begin
+	IsVerStr := true;
+	l := Length(s);
+	FOR i := 1 TO l DO Begin
+		If s[i] = '-' THEN
+			Break;
+		If s[i] = '.' THEN
+			Continue;
+		If NOT IsDigit(s[i]) then Begin
+			IsVerStr := false;
+			Break;
+		End;
+	End
+End;
+
+(*
  * Returns the package name from a package fileName
  *)
 Function SlackwarePDB.GetShortName(fileName : String) : String;
@@ -149,7 +171,7 @@ Begin
 	Repeat
 		idx  := Pos(#45, buf);
 		if (IsDigit(buf[1])) and (lastidx > 0) then Begin
-//			if IsVerStr(buf) then
+			if IsVerStr(buf) then
 				break;
 			End;
 		lastidx := lastidx + idx;
@@ -165,6 +187,96 @@ Begin
 End;
 
 (*
+ * Split text line 'str' to words and fills the array of strings 'v'
+ *)
+Procedure SlackwarePDB.Split(str : String; delim : String; Var v : StrList);
+Var	idx, l : Integer;
+	left : String;
+Begin
+	l := Length(str);
+	Repeat
+		idx := Pos(delim, str);
+		if idx <> 0 then begin
+			left := Copy(str, 1, idx - 1);
+			str  := Trim(Copy(str, idx + 1, l));
+			v.push(left);
+		End
+	Until idx = 0;
+	if Length(str) > 0 then
+		v.push(str);
+End;
+
+(*
+ * Get all filenames of directory
+ *)
+Procedure SlackwarePDB.GetFileList(var lst : StrList; dirx : String; pattern : String);
+Var	Info : TSearchRec;
+	prevDir : String;
+Begin
+	prevDir := GetCurrentDir;
+	SetCurrentDir(dirx);
+	If FindFirst(pattern, faAnyFile AND faReadOnly, Info) = 0 then
+	Begin
+		Repeat
+			lst.push(Info.Name);
+		Until FindNext(info)<>0;
+	End;
+	FindClose(Info);
+	SetCurrentDir(prevDir);
+End;
+
+(*
+ * Load data from 'package file' and store them inside the 'data' node
+ *)
+Procedure SlackwarePDB.LoadPackageDataFile(fname : String; var data : PKGPtr);
+Var	tf : TextFile;
+	buf, key, txt	: String;
+	fullname		: String;
+	idx				: Integer;
+Begin
+	fullname := Concat(PKGDataDir, '/', fname);
+	If FileExists(fullname) then Begin
+		Assign(tf, fullname);
+		{$I-}Reset(tf);{$I+}
+		If IOResult = 0 then Begin
+			While not EOF(tf) do Begin
+				ReadLn(tf, buf);
+				idx := Pos(Char(':'), buf);
+				if idx > 0 then Begin
+					key := Copy(buf, 1, idx - 1);
+					txt := Trim(Copy(buf, idx + 1, 255));
+					IF key = 'PACKAGE NAME' THEN
+						Continue
+					ELSE IF key = 'COMPRESSED PACKAGE SIZE' THEN
+						data^.Vars.Add(Concat('CSIZE=', txt))
+					ELSE IF key = 'UNCOMPRESSED PACKAGE SIZE' THEN
+						data^.Vars.Add(Concat('USIZE=', txt))
+					ELSE IF key = 'PACKAGE LOCATION' THEN
+						data^.Vars.Add(Concat('LOCATION=', txt))
+					ELSE IF key = 'PACKAGE DESCRIPTION' THEN
+						Continue
+					ELSE IF key = 'FILE LIST' THEN
+						BREAK
+					ELSE BEGIN
+						data^.Desc.Add(txt);
+					END
+				END
+				Else
+					BREAK
+			End; { While !EOF }
+			
+			Close(tf)
+		End Else Begin
+			if verbose then
+				WriteLn(fullname, ': cannot open file.');
+		End
+	End Else Begin
+		if verbose then
+			WriteLn(fullname, ': file does not exists.');
+		End
+End;
+
+(*
  * Load every package from /var/log/packages
  *)
 Procedure SlackwarePDB.LoadPackageList;
@@ -174,6 +286,10 @@ Var	fileList : StrList;
 	node	: BTreeNodePtr;
 Begin
 	fileList.Init;
+
+	IF verbose THEN
+		WriteLn('Processing ', PKGDataDir, ' ...');
+	
 	GetFileList(fileList, PKGDataDir);
 
 	cur := fileList.Head;
@@ -186,7 +302,7 @@ Begin
 		End Else Begin
 			node := packs.Insert(name, New(PKGPtr, Init(name, cur^.Key)));
 			PKGPtr(node^.Ptr)^.bInst := true;
-//			LoadPackageDataFile(node^.fname, node);			
+			LoadPackageDataFile(PKGPtr(node^.Ptr)^.FName, PKGPtr(node^.Ptr))
 		End;
 		cur := cur^.Next;
 	End; { While }
@@ -204,8 +320,6 @@ Begin
 	instlist.Init;
 	packs.Init;
 	
-	if verbose then
-		WriteLn('Loading ', PKGDataFile, ' ...');
 	LoadPackageList;
 	If LoadPACKAGESFile then Begin
 		if verbose then
@@ -246,6 +360,10 @@ Var
 Begin
 	pkg_desc.Init;
 	pkg_opts.Init;
+
+	if verbose then
+		WriteLn('Loading ', PKGDataFile, ' ...');
+
 	LoadPACKAGESFile := False;
 	If FileExists(PKGDataFile) then Begin
 		Assign(tf, PKGDataFile);
@@ -314,26 +432,6 @@ Begin
 End;
 
 (*
- * Split text line 'str' to words and fills the array of strings 'v'
- *)
-Procedure SlackwarePDB.Split(str : String; delim : String; Var v : StrList);
-Var	idx, l : Integer;
-	left : String;
-Begin
-	l := Length(str);
-	Repeat
-		idx := Pos(delim, str);
-		if idx <> 0 then begin
-			left := Copy(str, 1, idx - 1);
-			str  := Trim(Copy(str, idx + 1, l));
-			v.push(left);
-		End
-	Until idx = 0;
-	if Length(str) > 0 then
-		v.push(str);
-End;
-
-(*
  *  Load additional packages information into the memory (pkglist)
  *)
 Function SlackwarePDB.LoadRepoDataFile : Boolean;
@@ -386,25 +484,6 @@ Begin
 			LoadRepoDataFile := True
 		End
 	End
-End;
-
-(*
- * Get all filenames of directory
- *)
-Procedure SlackwarePDB.GetFileList(var lst : StrList; dirx : String; pattern : String);
-Var	Info : TSearchRec;
-	prevDir : String;
-Begin
-	prevDir := GetCurrentDir;
-	SetCurrentDir(dirx);
-	If FindFirst(pattern, faAnyFile AND faReadOnly, Info) = 0 then
-	Begin
-		Repeat
-			lst.push(Info.Name);
-		Until FindNext(info)<>0;
-	End;
-	FindClose(Info);
-	SetCurrentDir(prevDir);
 End;
 
 (* --- *)
