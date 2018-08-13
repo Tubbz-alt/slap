@@ -187,6 +187,26 @@ Begin
 End;
 
 (*
+ * Split text line 'str' to words and fills the array of strings 'v'
+ *)
+Procedure SlackwarePDB.Split(str : String; delim : String; Var v : StrList);
+Var     idx, l : Integer;
+        left : String;
+Begin
+	l := Length(str);
+	Repeat
+		idx := Pos(delim, str);
+		if idx <> 0 then begin
+			left := Copy(str, 1, idx - 1);
+			str  := Trim(Copy(str, idx + 1, l));
+			v.push(left);
+		End
+	Until idx = 0;
+	if Length(str) > 0 then
+		v.push(str);
+End;
+
+(*
  * Get all filenames of directory
  *)
 Procedure SlackwarePDB.GetFileList(var lst : StrList; dirx : String; pattern : String);
