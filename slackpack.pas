@@ -325,10 +325,14 @@ Begin
 		If LoadRepoDataFile then Begin
 			if verbose then
 				WriteLn('* DONE *');
-		End	Else
-			WriteLn(REPDataFile, ': FAILED!');
-	End	Else
-		WriteLn(PKGDataFile, ': FAILED!');
+		End	Else Begin
+			WriteLn('PANIC: ', REPDataFile, ': FAILED!');
+			Halt(1);
+		End
+	End	Else Begin
+		WriteLn('PANIC: ', PKGDataFile, ': FAILED!');
+		Halt(1);
+	End
 End;
 
 (*
