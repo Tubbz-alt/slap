@@ -56,8 +56,8 @@ Type
 		Constructor	Copy(src : StrList);
 		Procedure	Assign(src : StrList);
 		Procedure	Append(src : StrList);
-		Procedure	Add(key : String; pData : Pointer = NIL);
-		Procedure	Push(str : String; pData : Pointer = NIL); inline;
+		Function	Add(key : String; pData : Pointer = NIL) : StrListNodePtr;
+		Function	Push(str : String; pData : Pointer = NIL) : StrListNodePtr; inline;
 		Procedure	Clear;
 		Procedure	Delete(node : StrListNodePtr);
 		Function	Find(key : String) : StrListNodePtr;
@@ -143,7 +143,7 @@ End;
 (*
  * Adds a new node at the end of the list.
  *)
-Procedure StrList.Add(key : String; pData : Pointer);
+Function StrList.Add(key : String; pData : Pointer) : StrListNodePtr;
 Var	node : StrListNodePtr;
 Begin
 	node := New(StrListNodePtr);
@@ -160,11 +160,12 @@ Begin
 		pTail := node
 	End;
 	Inc(nCount);
+	Add := node;
 End;
 
-Procedure StrList.Push(str : String; pData : Pointer); inline;
+Function StrList.Push(str : String; pData : Pointer) : StrListNodePtr; inline;
 Begin
-	Add(str, pData);
+	Push := Add(str, pData);
 End;
 
 (*
