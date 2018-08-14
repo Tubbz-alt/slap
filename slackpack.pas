@@ -153,8 +153,10 @@ Begin
 		If s[i] = '.' THEN
 			Break;
 		If s[i] = '_' THEN
-			Continue;
+			Break;
 		If NOT IsDigit(s[i]) then Begin
+			IF ((s[i] = 'v') OR (s[i] = 'r')) AND (i = 1) THEN
+				Continue;
 			IsVerStr := false;
 			Break;
 		End;
@@ -174,7 +176,7 @@ Begin
 
 	Repeat
 		idx  := Pos(#45, buf);
-		if (IsDigit(buf[1])) and (lastidx > 0) then Begin
+		if (IsDigit(buf[1]) or (buf[1] = 'v') or (buf[1] = 'r')) and (lastidx > 0) then Begin
 			if IsVerStr(buf) then
 				break;
 			End;

@@ -207,6 +207,15 @@ Begin
 	BuildDescString := slContinue
 End;
 
+Procedure PrintProc(node : BTreeNodePtr);
+Var	data : PKGPtr;
+Begin
+	data := node^.Ptr;
+	if (opt_list_inst) and (NOT data^.bInst) then exit;
+	if (opt_list_uninst) and (data^.bInst) then exit;
+	PrintPackage(node)
+End;
+
 Procedure SearchProc(node : BTreeNodePtr);
 Var	data : PKGPtr;
 Begin
@@ -253,25 +262,31 @@ Begin
 	ParseCLIParams;
 	
 	pdb.Init(opt_verbose);
-	if ( opt_bsearch ) then Begin
+	IF opt_bsearch THEN
+	BEGIN
 		re := TRegExpr.Create(Concat('^', opt_search));
 		pdb.packs.Walk(@SearchProc);
 		re.Free;
-	End ELSE if ( opt_desc_bsearch ) then Begin
-		re := TRegExpr.Create(opt_desc_search);
-		pdb.packs.Walk(@SearchDescProc);
-		re.Free;
-	End ELSE if ( opt_brepo ) then Begin
-		pdb.packs.Walk(@RepoListProc);
-	End ELSE if ( opt_repolist ) then Begin
-		pdb.reposlist.Print(#10);
-	End ELSE if ( opt_list_inst ) then Begin
-		re := NIL;
-		pdb.packs.Walk(@SearchProc);
-	End ELSE if ( opt_list_uninst ) then Begin
-		re := NIL;
-		pdb.packs.Walk(@SearchProc);
-	End;
+	END 
+	ELSE
+		IF opt_desc_bsearch THEN
+		BEGIN
+			re := TRegExpr.Create(opt_desc_search);
+			pdb.packs.Walk(@SearchDescProc);
+			re.Free;
+		END
+		ELSE
+			IF opt_brepo THEN
+				pdb.packs.Walk(@RepoListProc)
+			ELSE
+				IF opt_repolist THEN
+					pdb.reposlist.Print(#10)
+				ELSE
+					IF opt_list_inst THEN
+						pdb.packs.Walk(@PrintProc)
+					ELSE
+						IF opt_list_uninst THEN
+							pdb.packs.Walk(@PrintProc);
 
 	pdb.Free;
 End.
