@@ -24,6 +24,7 @@
  * Nicholas Christopoulos nereus@freemail.gr
  *)
 {$MODE OBJFPC}
+{$MODESWITCH NESTEDPROCVARS} 
 
 Unit SBTree;
 
@@ -42,6 +43,8 @@ Type
 	End;
 
 	BTreeWalkProc = Procedure(node : BTreeNodePtr);
+	BTreeWalkNestProc = Procedure(node : BTreeNodePtr) is nested;
+    BTreeWalkMethod = Procedure(node : BTreeNodePtr) of Object;
 
 	BTree = Object
 	private
@@ -56,7 +59,10 @@ Type
 		Procedure	Clear;
 		Function	Insert(key : String; data : Pointer) : BTreeNodePtr;
 		Function	Find(key : String) : BTreeNodePtr;
-		Procedure	Walk(UDP : BTreeWalkProc; order : BTreeTraversal = btInorder);
+		Procedure	Walk(u1 : BTreeWalkProc; u2 : BTreeWalkNestProc; u3 : BTreeWalkMethod; order : BTreeTraversal = btInorder);
+		Procedure	Walk(UDP : BTreeWalkProc; order : BTreeTraversal = btInorder); inline;
+		Procedure	Walk(UDP : BTreeWalkNestProc; order : BTreeTraversal = btInorder); inline;
+		Procedure	Walk(UDP : BTreeWalkMethod; order : BTreeTraversal = btInorder); inline;
 	End;
 
 Implementation
@@ -152,13 +158,15 @@ End;
 (*
  * For each node of the tree
  *)
-Procedure BTree.Walk(UDP : BTreeWalkProc; order : BTreeTraversal);
+Procedure BTree.Walk(u1 : BTreeWalkProc; u2 : BTreeWalkNestProc; u3 : BTreeWalkMethod; order : BTreeTraversal);
 
 	Procedure PrintInOrder(root : BTreeNodePtr);
 	Begin
 		If root <> NIL then	Begin
 			PrintInOrder(root^.Left);
-			UDP(root);
+			IF u1 <> NIL THEN U1(root);
+			IF u2 <> NIL THEN U2(root);
+			IF u3 <> NIL THEN U3(root);
 			PrintInOrder(root^.Right)
 		End
 	End;
@@ -166,7 +174,9 @@ Procedure BTree.Walk(UDP : BTreeWalkProc; order : BTreeTraversal);
 	Procedure PrintPreOrder(root : BTreeNodePtr);
 	Begin
 		If root <> NIL then Begin
-			UDP(root);
+			IF u1 <> NIL THEN U1(root);
+			IF u2 <> NIL THEN U2(root);
+			IF u3 <> NIL THEN U3(root);
 			PrintPreOrder(root^.Left);
 			PrintPreOrder(root^.Right)
 		End
@@ -177,7 +187,9 @@ Procedure BTree.Walk(UDP : BTreeWalkProc; order : BTreeTraversal);
 		If root <> NIL then Begin
 			PrintPostOrder(root^.Left);
 			PrintPostOrder(root^.Right);
-			UDP(root)
+			IF u1 <> NIL THEN U1(root);
+			IF u2 <> NIL THEN U2(root);
+			IF u3 <> NIL THEN U3(root);
 		End
 	End;
 
@@ -187,7 +199,16 @@ Begin
 	btInorder   : PrintInOrder(root);
 	btPostorder : PrintPostOrder(root)
 	End
-End;
+end;
+
+Procedure BTree.Walk(UDP : BTreeWalkProc; order : BTreeTraversal); inline;
+BEGIN Walk(UDP, NIL, NIL, order) END;
+
+Procedure BTree.Walk(UDP : BTreeWalkNestProc; order : BTreeTraversal); inline;
+BEGIN Walk(NIL, UDP, NIL, order) END;
+
+Procedure BTree.Walk(UDP : BTreeWalkMethod; order : BTreeTraversal); inline;
+BEGIN Walk(NIL, NIL, UDP, order) END;
 
 (* --- end --- *)
 END.

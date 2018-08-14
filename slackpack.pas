@@ -24,7 +24,7 @@
  * Nicholas Christopoulos (nereus@freemail.gr)
  *)
 {$MODE OBJFPC}
-{$CODEPAGE UTF8}
+{$MODESWITCH NESTEDPROCVARS} 
 
 Unit Slackpack;
 
@@ -59,7 +59,6 @@ Type
 		bInst : Boolean;	{ true if it is installed }
 		
 		Constructor Init(key, filename : String);
-		Constructor Init2(key, filename : String; txt, opts : StrList);
 		Destructor  Free; virtual;
 	End;
 
@@ -98,17 +97,6 @@ Implementation
 (*
  * Initialize package information object
  *)
-Constructor PKG.Init2(key, filename : String; txt, opts : StrList);
-Begin
-	bInst := false;
-	Name  := key;
-	FName := filename;
-	Desc.Copy(txt);
-	Vars.Copy(opts);
-	Repos.Init;
-	Vers.Init;
-End;
-
 Constructor PKG.Init(key, filename : String);
 Begin
 	bInst := false;

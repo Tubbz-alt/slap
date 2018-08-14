@@ -24,7 +24,7 @@
  * Nicholas Christopoulos (nereus@freemail.gr)
  *)
 {$MODE OBJFPC}
-{$CODEPAGE UTF8}
+{$MODESWITCH NESTEDPROCVARS} 
 
 Program Slap;
 
@@ -148,24 +148,27 @@ End;
 (*
  * Displays package information
  *)
-Var pd_last : String;
-Var pd_n : Integer;
-Function PrintDesc(nd : StrListNodePtr) : StrListWalkResult;
-Var ll, ls : Integer;
-Begin
-	Inc(pd_n);
-	ll := Length(pd_last);
-	pd_last := Trim(nd^.Key);
-	ls := Length(pd_last);
-	if (ll <> 0) OR (ls <> 0) then begin
-		if (pd_n = 2) and (ls <> 0) then
-			WriteLn;
-		WriteLn(#9, nd^.Key);
-	end;
-	PrintDesc := slContinue;
-End;
 Procedure PrintPackage(node : BTreeNodePtr);
 Var	data	: PKGPtr;
+
+	Var pd_last : String;
+	Var pd_n : Integer;
+	
+	Function PrintDesc(nd : StrListNodePtr) : StrListWalkResult;
+	Var ll, ls : Integer;
+	Begin
+		Inc(pd_n);
+		ll := Length(pd_last);
+		pd_last := Trim(nd^.Key);
+		ls := Length(pd_last);
+		if (ll <> 0) OR (ls <> 0) then begin
+			if (pd_n = 2) and (ls <> 0) then
+				WriteLn;
+			WriteLn(#9, nd^.Key);
+		end;
+		PrintDesc := slContinue;
+	End;
+
 Begin
 	data := node^.Ptr;
 	if opt_names then
@@ -199,13 +202,6 @@ End;
  * search for package callback
  *)
 Var re : TRegExpr;
-	ls_desc : LongString;
-
-Function BuildDescString(slnode : StrListNodePtr) : StrListWalkResult;
-Begin
-	ls_desc := Concat(ls_desc, slnode^.Key);
-	BuildDescString := slContinue
-End;
 
 Procedure PrintProc(node : BTreeNodePtr);
 Var	data : PKGPtr;
@@ -230,12 +226,12 @@ End;
 
 Procedure SearchDescProc(node : BTreeNodePtr);
 Var	data : PKGPtr;
+	ls_desc : LongString;
 Begin
 	data := node^.Ptr;
 	if (opt_list_inst) and (NOT data^.bInst) then exit;
 	if (opt_list_uninst) and (data^.bInst) then exit;
-	ls_desc := '';
-	data^.desc.Walk(@BuildDescString);
+	ls_desc := data^.desc.toLongString;
 	if (re<>NIL) AND (re.Exec(node^.Key)) then
 		PrintPackage(node)
 	else if (re<>NIL) AND (re.Exec(ls_desc)) then

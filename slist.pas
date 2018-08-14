@@ -24,12 +24,16 @@
  * Nicholas Christopoulos nereus@freemail.gr
  *)
 {$MODE OBJFPC}
-
+{$MODESWITCH NESTEDPROCVARS} 
+ 
 Unit slist;
 
 Interface
 
 Uses SysUtils;
+
+Type
+    LongString = UTF8String;
 
 Type
 	StrListNodePtr = ^StrListNode;
@@ -41,6 +45,8 @@ Type
 	
 	StrListWalkResult = (slStop, slContinue);
 	StrListWalkProc = Function(node : StrListNodePtr) : StrListWalkResult;
+	StrListWalkNestProc = Function(node : StrListNodePtr) : StrListWalkResult is nested;
+	StrListWalkMethod = Function(node : StrListNodePtr) : StrListWalkResult of Object;
 
 	StrList = Object
 	private
@@ -61,10 +67,14 @@ Type
 		Procedure	Clear;
 		Procedure	Delete(node : StrListNodePtr);
 		Function	Find(key : String) : StrListNodePtr;
-		Procedure	Walk(UDF : StrListWalkProc);
+		Procedure	Walk(u1 : StrListWalkProc; u2 : StrListWalkNestProc; u3 : StrListWalkMethod);
+		Procedure	Walk(UDF : StrListWalkProc); inline;
+		Procedure	Walk(UDF : StrListWalkNestProc); inline;
+		Procedure	Walk(UDF : StrListWalkMethod); inline;
 		Procedure	Print(delim : String = #10; prefix : String = '');
 		Function	Count : Integer; inline;
 		Function	Head  : StrListNodePtr; inline;
+        Function	ToLongString : LongString;
 	End;
 
 Operator in (const A: String; const B: StrList) : Boolean;
@@ -264,15 +274,41 @@ End;
 (*
  * Call UDF for each node; UDF should return slStop to stop the process.
  *)
-Procedure StrList.Walk(UDF : StrListWalkProc);
+Procedure StrList.Walk(u1 : StrListWalkProc; u2 : StrListWalkNestProc; u3 : StrListWalkMethod);
 Var cur	: StrListNodePtr;
 Begin
 	cur := pHead;
 	While cur <> NIL do	Begin
-		if UDF(cur) = slStop then
-			break;
+		IF (u1 <> NIL) AND (u1(cur) = slStop) then	break;
+		IF (u2 <> NIL) AND (u2(cur) = slStop) then	break;
+		IF (u3 <> NIL) AND (u3(cur) = slStop) then	break;
 		cur := cur^.Next
 	End
+End;
+
+Procedure StrList.Walk(UDF : StrListWalkProc); inline;
+BEGIN Walk(UDF,NIL,NIL) END;
+
+Procedure StrList.Walk(UDF : StrListWalkNestProc); inline;
+BEGIN Walk(NIL,UDF,NIL) END;
+
+Procedure StrList.Walk(UDF : StrListWalkMethod); inline;
+BEGIN Walk(NIL,NIL,UDF) END;
+
+(*
+ *	Returns variable string (ansistring) version of the Texts
+ *)
+Function StrList.ToLongString : LongString;
+Var cur : StrListNodePtr;
+  	s	: LongString;
+Begin
+	cur := pHead;
+	s   := '';
+	while cur <> NIL do Begin
+		s := Concat(s, #10, cur^.Key);
+		cur := cur^.Next
+	End;
+    ToLongString := s
 End;
 
 (* --- end --- *)
