@@ -183,7 +183,7 @@ Begin
 		Write('Versions     : ');
 		data^.Vers.Print(#32);
 		WriteLn;
-{		WriteLn('Variables    : ', data^.Vars); }
+		WriteLn('Size         : ', data^.USize, '; ', data^.CSize, ' compressed. ');
 		WriteLn('Variables    : ');
 		data^.Vars.Print;
 		WriteLn('DESCRIPTION');

@@ -50,6 +50,8 @@ Type
 	public
 		Name  : String;		{ Name }
 		FName : String;		{ File-name }
+		CSize, USize : String;
+		Location : String;
 		Desc  : StrList;	{ multi-line description }
 		Vars  : StrList;	{ other variables }
 		Repos : StrList;	{ list of repositories }
@@ -149,6 +151,8 @@ Begin
 		If s[i] = '-' THEN
 			Break;
 		If s[i] = '.' THEN
+			Break;
+		If s[i] = '_' THEN
 			Continue;
 		If NOT IsDigit(s[i]) then Begin
 			IsVerStr := false;
@@ -248,11 +252,11 @@ Begin
 					IF key = 'PACKAGE NAME' THEN
 						Continue
 					ELSE IF key = 'COMPRESSED PACKAGE SIZE' THEN
-						data^.Vars.Add(Concat('CSIZE=', txt))
+						data^.CSize := txt
 					ELSE IF key = 'UNCOMPRESSED PACKAGE SIZE' THEN
-						data^.Vars.Add(Concat('USIZE=', txt))
+						data^.USize := txt
 					ELSE IF key = 'PACKAGE LOCATION' THEN
-						data^.Vars.Add(Concat('LOCATION=', txt))
+						data^.Location := txt
 					ELSE IF key = 'PACKAGE DESCRIPTION' THEN
 						Continue
 					ELSE IF key = 'FILE LIST' THEN
@@ -351,7 +355,7 @@ End;
 Function SlackwarePDB.LoadPACKAGESFile : Boolean;
 Var
 	tf : TextFile;
-	buf, key, txt, wrd, pkg_name, pkg_fname : String;
+	buf, key, txt, wrd, pkg_name, pkg_fname, pkg_csize, pkg_usize, pkg_location : String;
 	pkg_desc, pkg_opts : StrList;
 	idx : Integer;
 	recBlock, hasKey : Boolean;
@@ -387,6 +391,9 @@ Begin
 							pkg_name := '';
 							pkg_fname := Trim(Copy(buf, idx + 1, 255));
 							pkg_desc.Clear;
+							pkg_csize := '0';
+							pkg_usize := '0';
+							pkg_location := '';
 						End;
 					End Else Begin
 						Continue
@@ -403,10 +410,13 @@ Begin
 							if Length(txt) > 0 then Begin
 								wrd := Copy(key, 9, 255);
 								if wrd = 'SIZE (compressed)' then
-									wrd := 'CSIZE'
+									pkg_csize := txt
 								else if wrd = 'SIZE (uncompressed)' then
-									wrd := 'USIZE';
-								pkg_opts.Add(Concat(wrd, '=', txt));
+									pkg_usize := txt
+								else if wrd = 'LOCATION' then
+									pkg_location := txt
+								else
+									pkg_opts.Add(Concat(wrd, '=', txt));
 							End
 						End Else Begin
 							pkg_name := key;
@@ -417,12 +427,14 @@ Begin
 						{ store data }
 						node := packs.Find(pkg_name);
 						If node = NIL then
-							packs.Insert(pkg_name, New(PKGPtr, Init2(pkg_name, pkg_fname, pkg_desc, pkg_opts)))
-						Else Begin
-							data := node^.Ptr;
-							data^.Desc.Assign(pkg_desc);
-							data^.Vars.Assign(pkg_opts);
-						End
+							node := packs.Insert(pkg_name, New(PKGPtr, Init(pkg_name, pkg_fname)));
+						
+						data := node^.Ptr;
+						data^.Desc.Assign(pkg_desc);
+						data^.Vars.Assign(pkg_opts);
+						data^.CSize := pkg_csize;
+						data^.USize := pkg_usize;
+						data^.Location := pkg_location
 					End
 				End
 			End; { While }
