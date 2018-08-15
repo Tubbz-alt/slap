@@ -30,7 +30,7 @@ interface
 
 uses
 	Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-	StdCtrls,
+	StdCtrls, ComCtrls,
     SBTree, SList, SlackPack;
 
 type
@@ -38,10 +38,19 @@ type
 	{ TFMain }
 
  TFMain = class(TForm)
+		ComboBox1: TComboBox;
+		ComboBox2: TComboBox;
+		Label1: TLabel;
+		Label2: TLabel;
+		txtSearchFor: TLabeledEdit;
 		ListBox1: TListBox;
 		Memo1: TMemo;
 		Panel1: TPanel;
 		Panel2: TPanel;
+		Panel3: TPanel;
+		Panel4: TPanel;
+		Splitter1: TSplitter;
+		StatusBar1: TStatusBar;
 		procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
 		procedure FormCreate(Sender: TObject);
 		procedure ListBox1Click(Sender: TObject);
@@ -70,8 +79,10 @@ end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
+    StatusBar1.SimpleText := 'Slackware Package DB ... Loading';
 	pdb.Init;
 	pdb.packs.Walk(@PopulateListBox);
+    StatusBar1.SimpleText := 'Slackware Package DB ... done';
     Memo1.Text := '';
 end;
 
@@ -82,6 +93,7 @@ begin
 	if ListBox1.ItemIndex <> -1 then
 	begin
 	 	s := ListBox1.Items[ListBox1.ItemIndex];
+        StatusBar1.SimpleText := Concat('Package: ', s);
 		node := pdb.packs.Find(s);
         if node <> NIL then
 			Memo1.Text := PKGPtr(node^.Ptr)^.Desc.ToLongString;

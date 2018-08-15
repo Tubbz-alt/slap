@@ -9,7 +9,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="4"/>
         <CursorPos X="42" Y="18"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -20,9 +20,9 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="FMain"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="49"/>
-        <CursorPos X="61" Y="73"/>
-        <UsageCount Value="21"/>
+        <TopLine Value="61"/>
+        <CursorPos X="56" Y="97"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -32,7 +32,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="37"/>
         <CursorPos X="47" Y="62"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -40,7 +40,7 @@
         <UnitName Value="Slackpack"/>
         <EditorIndex Value="2"/>
         <TopLine Value="447"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -48,7 +48,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="268"/>
         <CursorPos X="9" Y="307"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
@@ -70,123 +70,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="fmain.pas"/>
-        <Caret Line="33" Column="37" TopLine="7"/>
+        <Caret Line="85" Column="19" TopLine="52"/>
       </Position1>
       <Position2>
-        <Filename Value="lazSlap.lpr"/>
-        <Caret Line="11" Column="61"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="86" Column="24" TopLine="52"/>
       </Position2>
       <Position3>
-        <Filename Value="lazSlap.lpr"/>
-        <Caret Line="25"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="85" Column="45" TopLine="52"/>
       </Position3>
       <Position4>
-        <Filename Value="fmain.pas"/>
-        <Caret Line="33" Column="36" TopLine="7"/>
+        <Filename Value="../slist.pas"/>
+        <Caret Line="291" Column="22" TopLine="247"/>
       </Position4>
       <Position5>
-        <Filename Value="lazSlap.lpr"/>
-        <Caret Line="25"/>
+        <Filename Value="../slist.pas"/>
+        <Caret Line="35" Column="17" TopLine="11"/>
       </Position5>
       <Position6>
-        <Filename Value="lazSlap.lpr"/>
-        <Caret Line="16" Column="22"/>
+        <Filename Value="../slist.pas"/>
+        <Caret Line="293" Column="6" TopLine="252"/>
       </Position6>
       <Position7>
-        <Filename Value="lazSlap.lpr"/>
-        <Caret Line="25"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="61" Column="37" TopLine="49"/>
       </Position7>
       <Position8>
-        <Filename Value="lazSlap.lpr"/>
-        <Caret Line="16" Column="30"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="30" Column="24"/>
       </Position8>
       <Position9>
-        <Filename Value="lazSlap.lpr"/>
-        <Caret Line="25"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="57" Column="3" TopLine="25"/>
       </Position9>
       <Position10>
         <Filename Value="fmain.pas"/>
-        <Caret Line="64" TopLine="24"/>
+        <Caret Line="25" Column="11" TopLine="16"/>
       </Position10>
       <Position11>
         <Filename Value="fmain.pas"/>
-        <Caret Line="70" Column="45" TopLine="31"/>
+        <Caret Line="57" Column="8" TopLine="33"/>
       </Position11>
       <Position12>
         <Filename Value="fmain.pas"/>
-        <Caret Line="51" Column="44" TopLine="30"/>
+        <Caret Line="73" Column="58" TopLine="48"/>
       </Position12>
       <Position13>
         <Filename Value="fmain.pas"/>
-        <Caret Line="52" Column="28" TopLine="25"/>
+        <Caret Line="74" Column="58" TopLine="49"/>
       </Position13>
       <Position14>
         <Filename Value="fmain.pas"/>
-        <Caret Line="70" Column="18" TopLine="36"/>
+        <Caret Line="75" Column="58" TopLine="50"/>
       </Position14>
       <Position15>
         <Filename Value="fmain.pas"/>
-        <Caret Line="68" TopLine="36"/>
+        <Caret Line="74" Column="58" TopLine="49"/>
       </Position15>
       <Position16>
-        <Filename Value="../sbtree.pas"/>
-        <Caret Line="45" Column="48" TopLine="19"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="73" Column="58" TopLine="48"/>
       </Position16>
       <Position17>
         <Filename Value="fmain.pas"/>
-        <Caret Line="68" Column="36" TopLine="41"/>
+        <Caret Line="72" Column="58" TopLine="47"/>
       </Position17>
       <Position18>
         <Filename Value="fmain.pas"/>
-        <Caret Line="83" Column="26" TopLine="47"/>
+        <Caret Line="71" Column="58" TopLine="46"/>
       </Position18>
       <Position19>
         <Filename Value="fmain.pas"/>
-        <Caret Line="84" Column="38" TopLine="50"/>
+        <Caret Line="72" Column="58" TopLine="47"/>
       </Position19>
       <Position20>
         <Filename Value="fmain.pas"/>
-        <Caret Line="85" Column="19" TopLine="52"/>
+        <Caret Line="73" Column="58" TopLine="48"/>
       </Position20>
       <Position21>
         <Filename Value="fmain.pas"/>
-        <Caret Line="86" Column="24" TopLine="52"/>
+        <Caret Line="74" Column="58" TopLine="49"/>
       </Position21>
       <Position22>
         <Filename Value="fmain.pas"/>
-        <Caret Line="85" Column="45" TopLine="52"/>
+        <Caret Line="75" Column="58" TopLine="50"/>
       </Position22>
       <Position23>
-        <Filename Value="../slist.pas"/>
-        <Caret Line="291" Column="22" TopLine="247"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="76" Column="58" TopLine="51"/>
       </Position23>
       <Position24>
-        <Filename Value="../slist.pas"/>
-        <Caret Line="35" Column="17" TopLine="11"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="92" Column="50" TopLine="56"/>
       </Position24>
       <Position25>
-        <Filename Value="../slist.pas"/>
-        <Caret Line="293" Column="6" TopLine="252"/>
+        <Filename Value="fmain.pas"/>
+        <Caret Line="93" Column="50" TopLine="57"/>
       </Position25>
       <Position26>
         <Filename Value="fmain.pas"/>
-        <Caret Line="61" Column="37" TopLine="49"/>
+        <Caret Line="94" Column="50" TopLine="58"/>
       </Position26>
       <Position27>
         <Filename Value="fmain.pas"/>
-        <Caret Line="30" Column="24"/>
+        <Caret Line="93" Column="50" TopLine="57"/>
       </Position27>
       <Position28>
         <Filename Value="fmain.pas"/>
-        <Caret Line="57" Column="3" TopLine="25"/>
+        <Caret Line="94" Column="50" TopLine="58"/>
       </Position28>
       <Position29>
         <Filename Value="fmain.pas"/>
-        <Caret Line="25" Column="11" TopLine="16"/>
+        <Caret Line="95" Column="50" TopLine="59"/>
       </Position29>
       <Position30>
         <Filename Value="fmain.pas"/>
-        <Caret Line="57" Column="8" TopLine="33"/>
+        <Caret Line="96" Column="50" TopLine="60"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>
