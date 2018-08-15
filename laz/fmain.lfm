@@ -6,7 +6,6 @@ object FMain: TFMain
   Caption = 'SLAP'
   ClientHeight = 631
   ClientWidth = 901
-  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   LCLVersion = '1.6.4.0'
@@ -51,12 +50,12 @@ object FMain: TFMain
     ParentColor = False
     TabOrder = 1
     object Memo1: TMemo
-      Left = 5
-      Height = 613
-      Top = 5
-      Width = 629
+      Left = 9
+      Height = 605
+      Top = 9
+      Width = 621
       Align = alClient
-      BorderSpacing.Around = 4
+      BorderSpacing.Around = 8
       BorderStyle = bsNone
       Font.Height = -13
       Font.Name = 'Monospace'

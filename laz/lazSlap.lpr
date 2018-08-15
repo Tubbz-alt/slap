@@ -8,15 +8,14 @@ uses
 	{$ENDIF}{$ENDIF}
 	Interfaces, // this includes the LCL widgetset
 	Forms, fmain
-	{ you can add units after this }, SBTree, SList, SlackPack, fmsg;
+	{ you can add units after this }, SBTree, SList, SlackPack;
 
 {$R *.res}
 
 begin
 	RequireDerivedFormResource:=True;
 	Application.Initialize;
-	Application.CreateForm(TFMain, FMainF);
-	Application.CreateForm(TFMesg, FMesg);
+	Application.CreateForm(TFMain, FMain1);
 	Application.Run;
 end.
 

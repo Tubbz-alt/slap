@@ -34,7 +34,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="3">
+    <Units Count="2">
       <Unit0>
         <Filename Value="lazSlap.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -43,15 +43,10 @@
         <Filename Value="fmain.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FMain"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="FMain"/>
       </Unit1>
-      <Unit2>
-        <Filename Value="fmsg.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="FMesg"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit2>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

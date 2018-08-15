@@ -304,7 +304,7 @@ Begin
 	cur := pHead;
 	s   := '';
 	while cur <> NIL do Begin
-		s := Concat(s, #10, cur^.Key);
+		s := Concat(s, cur^.Key, #10);
 		cur := cur^.Next
 	End;
     ToLongString := s

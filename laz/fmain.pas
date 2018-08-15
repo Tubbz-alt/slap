@@ -30,7 +30,7 @@ interface
 
 uses
 	Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-	StdCtrls, fmsg,
+	StdCtrls,
     SBTree, SList, SlackPack;
 
 type
@@ -42,20 +42,19 @@ type
 		Memo1: TMemo;
 		Panel1: TPanel;
 		Panel2: TPanel;
-		procedure FormActivate(Sender: TObject);
 		procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
 		procedure FormCreate(Sender: TObject);
 		procedure ListBox1Click(Sender: TObject);
 	private
 		{ private declarations }
        pdb : SlackwarePDB;
-       Procedure PopLB(node : BTreeNodePtr);
+       Procedure PopulateListBox(node : BTreeNodePtr);
 	public
 		{ public declarations }
 	end;
 
 var
-	FMainF: TFMain;
+	FMain1 : TFMain;
 
 
 implementation
@@ -64,39 +63,34 @@ implementation
 
 { TFMain }
 
-Procedure TFMain.PopLB(node : BTreeNodePtr);
+Procedure TFMain.PopulateListBox(node : BTreeNodePtr);
 Begin
-	 FMainF.ListBox1.AddItem(node^.Key, NIL);
+	ListBox1.AddItem(node^.Key, NIL);
 end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
-//	 FMesg.setmsg('Building package database...');
-	 pdb.Init;
-	 pdb.packs.Walk(@PopLB);
+	pdb.Init;
+	pdb.packs.Walk(@PopulateListBox);
+    Memo1.Text := '';
 end;
 
 procedure TFMain.ListBox1Click(Sender: TObject);
-Var		  s : String;
-    node : BTreeNodePtr;
+Var	s : String;
+	node : BTreeNodePtr;
 begin
-	 if ListBox1.ItemIndex <> -1 then
-     begin
+	if ListBox1.ItemIndex <> -1 then
+	begin
 	 	s := ListBox1.Items[ListBox1.ItemIndex];
 		node := pdb.packs.Find(s);
-        if node <> NIL then begin
-		   Memo1.Text := PKGPtr(node^.Ptr)^.Desc.ToLongString;
-           end
-     end
-end;
-
-procedure TFMain.FormActivate(Sender: TObject);
-begin
+        if node <> NIL then
+			Memo1.Text := PKGPtr(node^.Ptr)^.Desc.ToLongString;
+	end
 end;
 
 procedure TFMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-    pdb.Free;
+	pdb.Free;
 end;
 
 end.
