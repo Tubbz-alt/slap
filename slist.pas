@@ -74,7 +74,7 @@ Type
 		Procedure	Print(delim : String = #10; prefix : String = '');
 		Function	Count : Integer; inline;
 		Function	Head  : StrListNodePtr; inline;
-        Function	ToLongString : LongString;
+		Function	ToLongString : LongString;
 	End;
 
 Operator in (const A: String; const B: StrList) : Boolean;
@@ -278,9 +278,9 @@ Var cur	: StrListNodePtr;
 Begin
 	cur := pHead;
 	While cur <> NIL do	Begin
-		IF (u1 <> NIL) AND (u1(cur) = slStop) then	break;
-		IF (u2 <> NIL) AND (u2(cur) = slStop) then	break;
-		IF (u3 <> NIL) AND (u3(cur) = slStop) then	break;
+		IF (u1 <> NIL) AND (u1(cur) = slStop) THEN BREAK;
+		IF (u2 <> NIL) AND (u2(cur) = slStop) THEN BREAK;
+		IF (u3 <> NIL) AND (u3(cur) = slStop) THEN BREAK;
 		cur := cur^.Next
 	End
 End;
