@@ -226,7 +226,6 @@ End;
 Procedure StrList.Append(src : StrList);
 Var cur : StrListNodePtr;
 Begin
-	Clear;
 	cur := src.pHead;
 	while cur <> NIL do Begin
 		Add(cur^.Key, cur^.Data);
