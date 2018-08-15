@@ -43,8 +43,8 @@ Type
 	End;
 
 	BTreeWalkProc = Procedure(node : BTreeNodePtr);
-	BTreeWalkNestProc = Procedure(node : BTreeNodePtr) is nested;
-    BTreeWalkMethod = Procedure(node : BTreeNodePtr) of Object;
+	BTreeWalkNestProc = Procedure(node : BTreeNodePtr) is Nested;
+	BTreeWalkMethod = Procedure(node : BTreeNodePtr) of Object;
 
 	BTree = Object
 	private

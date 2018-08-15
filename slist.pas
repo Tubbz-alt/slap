@@ -45,7 +45,7 @@ Type
 	
 	StrListWalkResult = (slStop, slContinue);
 	StrListWalkProc = Function(node : StrListNodePtr) : StrListWalkResult;
-	StrListWalkNestProc = Function(node : StrListNodePtr) : StrListWalkResult is nested;
+	StrListWalkNestProc = Function(node : StrListNodePtr) : StrListWalkResult is Nested;
 	StrListWalkMethod = Function(node : StrListNodePtr) : StrListWalkResult of Object;
 
 	StrList = Object
