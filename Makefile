@@ -27,12 +27,19 @@ slackpack.ppu: slackpack.pas
 slap: slap.pas sbtree.ppu slist.ppu slackpack.ppu
 	$(PC) $(PCFLAGS) slap.pas
 
+lazSlap:
+	lazbuild laz/lazSlap.lpr
+
 clean:
 	@-rm *.{bak,o,ppu,map} slap >& /dev/null
 
-release:
-	@-rm *.{bak,o,ppu,map} slap >& /dev/null
+pack:
+	@-rm *.{bak,o,ppu,map} slap laz/lazSlap >& /dev/null
+	@-mkdir release
 	$(PC) $(PCFLAGS_RELEASE) slap.pas
+	@-rm *.{bak,o,ppu,map} laz/lazSlap >& /dev/null
+	lazbuild laz/lazSlap.lpr
+	zip release/binaries.zip slap laz/lazSlap
 
 push:
 	git add .

@@ -31,7 +31,7 @@ interface
 uses
 	Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
 	StdCtrls, ComCtrls,
-    SBTree, SList, SlackPack;
+    SBTree, SList, SlackPack, RegExpr;
 
 type
 
@@ -40,6 +40,7 @@ type
  TFMain = class(TForm)
 		btnInstall: TButton;
 		btnRemove: TButton;
+		btnGo: TButton;
 		chkDescr: TCheckBox;
 		cmbList: TComboBox;
 		Image1: TImage;
@@ -58,17 +59,22 @@ type
 		Panel4: TPanel;
 		Splitter1: TSplitter;
 		StatusBar1: TStatusBar;
-		procedure cmbListChange(Sender: TObject);
+		procedure btnGoClick(Sender: TObject);
+  procedure chkDescrChange(Sender: TObject);
+  procedure cmbListChange(Sender: TObject);
   procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
 		procedure FormCreate(Sender: TObject);
 		procedure ListBox1Click(Sender: TObject);
 		procedure lstReposChange(Sender: TObject);
+		procedure txtSearchForChange(Sender: TObject);
 	private
 		{ private declarations }
        pdb : SlackwarePDB;
        opt_installed : Boolean;
        opt_uninstalled : Boolean;
        opt_repo : String;
+		opt_regexp : TRegExpr;
+        opt_search_desc : Boolean;
        Procedure PopulateListBox(node : BTreeNodePtr);
        Procedure RebuildPackageList;
        Function	StoreRepo(node : StrListNodePtr) : StrListWalkResult;
@@ -89,22 +95,34 @@ implementation
 
 Procedure TFMain.PopulateListBox(node : BTreeNodePtr);
 Var data : PKGPtr;
-    badd : Boolean;
 Begin
     data := node^.Ptr;
-    badd := true;
     if opt_installed and (NOT data^.bInst) then
-    	badd := false;
+		exit;
 	if opt_uninstalled and data^.bInst then
-        badd := false;
+		exit;
     if opt_repo <> 'ALL' then
         Begin
         if NOT (opt_repo in data^.repos) then
-			badd := false;
+			exit;
         End;
+    if opt_regexp <> NIL then
+        Begin
+        if opt_search_desc then
+            begin
+	    	if	(NOT opt_regexp.Exec(node^.Key))
+	        	AND
+				(NOT opt_regexp.Exec(data^.desc.toLongString)) then
+				exit;
+            end
+        else
+        	begin
+   	    	if	NOT opt_regexp.Exec(node^.Key) then
+                exit;
+			end;
+		end;
 
-    if badd then
-		ListBox1.AddItem(node^.Key, NIL);
+	ListBox1.AddItem(node^.Key, NIL);
 end;
 
 Function TFMain.StoreRepo(node : StrListNodePtr) : StrListWalkResult;
@@ -114,19 +132,31 @@ Begin
 end;
 
 Procedure TFMain.RebuildPackageList;
+Var	s : String;
+    node : BTreeNodePtr;
 Begin
+	StatusBar1.SimpleText := 'Calculating...';
     ListBox1.Clear;
 	pdb.packs.Walk(@PopulateListBox);
-//    if ListBox1.Items.Count > 0 then
-//	    ListBox1.ItemIndex := 0
-//    else
-//    	Memo1.Text := '';
+    if ListBox1.Items.Count > 0 then
+        Begin
+	    ListBox1.ItemIndex := 0;
+        s := ListBox1.Items[0];
+        node := pdb.packs.Find(s);
+        if node <> NIL then
+            ShowPackage(node);
+		end
+	else
+    	Memo1.Text := '';
+	StatusBar1.SimpleText := 'Done';
 end;
 
 procedure TFMain.FormCreate(Sender: TObject);
 begin
     opt_installed := false;
     opt_uninstalled := false;
+    opt_search_desc := false;
+    opt_regexp := NIL;
     opt_repo := 'ALL';
     StatusBar1.SimpleText := 'Slackware Package DB ... Loading';
 	pdb.Init;
@@ -136,7 +166,6 @@ begin
     pdb.reposlist.Walk(@StoreRepo);
     lstRepos.ItemIndex := 0;
     StatusBar1.SimpleText := 'Slackware Package DB ... ';
-    Memo1.Text := '';
 end;
 
 Procedure TFMain.ShowPackage(node : BTreeNodePtr);
@@ -146,13 +175,13 @@ Begin
     data := node^.Ptr;
     s := '';
     if data^.bInst then
-		s := Concat(s, 'PACKAGE: ', data^.Name, ' INSTALLED', #10#10)
+		s := Concat(s, 'PACKAGE : ', data^.Name, ' INSTALLED', #10#10)
     else
-   		s := Concat(s, 'PACKAGE: ', data^.Name, ' UNINSTALLED', #10#10);
-	s := Concat(s, 'FILE: ', data^.FName, #10);
-	s := Concat(s, 'REPO: ', data^.Repos.toLongString('; '), #10);
-	s := Concat(s, 'VERS: ', data^.Vers.toLongString('; '), #10);
-	s := Concat(s, 'SIZE: ', data^.USize, '; ', data^.CSize, ' compressed. ', #10);
+		s := Concat(s, 'PACKAGE : ', data^.Name, ' UNINSTALLED', #10#10);
+	s := Concat(s, 'FILENAME: ', data^.FName, #10);
+	s := Concat(s, 'REPOSITR: ', data^.Repos.toLongString('; '), #10);
+	s := Concat(s, 'VERSION : ', data^.Vers.toLongString('; '), #10);
+	s := Concat(s, 'SIZE    : ', data^.USize, '; ', data^.CSize, ' compressed. ', #10);
 {			s := Concat(s, 'Variables    : ');
      data^.Vars.Print;}
     s := Concat(s, #10, data^.desc.ToLongString, #10);
@@ -179,8 +208,18 @@ begin
     RebuildPackageList;
 end;
 
+procedure TFMain.txtSearchForChange(Sender: TObject);
+begin
+
+end;
+
 procedure TFMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
+    if opt_regexp <> NIL then
+    	Begin
+    	opt_regexp.Free;
+        opt_regexp := NIL;
+		end;
 	pdb.Free;
 end;
 
@@ -200,6 +239,25 @@ begin
     	opt_uninstalled := true;
         End;
 	end;
+    RebuildPackageList;
+end;
+
+procedure TFMain.chkDescrChange(Sender: TObject);
+begin
+    opt_search_desc := chkDescr.Checked;
+end;
+
+procedure TFMain.btnGoClick(Sender: TObject);
+Var	s : String;
+begin
+    if opt_regexp <> NIL then
+    	Begin
+    	opt_regexp.Free;
+        opt_regexp := NIL;
+        End;
+	s := Trim(txtSearchFor.Text);
+    if length(s) > 0 then
+        opt_regexp := TRegExpr.Create(s);
     RebuildPackageList;
 end;
 

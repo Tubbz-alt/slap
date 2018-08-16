@@ -2,7 +2,6 @@
 * -sf search for file
 * add support for slackbuilds (sbopkg)
 * export to SQL
-* GUI APP
 
 Additional, Hacks:
 * install older binary package without upgrade
