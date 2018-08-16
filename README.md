@@ -8,7 +8,7 @@ What it does until now:
 * Select list to search based on repository and installed/uninstalled status
 
 Use `slap -h` for help
-https://github.com/nereusx/slap/blob/master/images/slap-1.png
+![terminal](https://github.com/nereusx/slap/blob/master/images/slap-1.png)
 
 GUI screenshots
 ![startup](https://github.com/nereusx/slap/blob/master/images/lazslap-1.png)
