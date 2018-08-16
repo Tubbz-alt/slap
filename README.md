@@ -9,6 +9,8 @@ What it does until now:
 
 Use `slap -h` for help
 
+A static-linked version of executables is [here](https://github.com/nereusx/slap/tree/master/release/binaries.zip)
+
 ## Screenshots
 
 ![startup](https://github.com/nereusx/slap/blob/master/images/lazslap-1.png)
