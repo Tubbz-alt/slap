@@ -74,7 +74,7 @@ Type
 		Procedure	Print(delim : String = #10; prefix : String = '');
 		Function	Count : Integer; inline;
 		Function	Head  : StrListNodePtr; inline;
-		Function	ToLongString : LongString;
+		Function	ToLongString(sep : String = #10) : LongString;
 	End;
 
 Operator in (const A: String; const B: StrList) : Boolean;
@@ -297,14 +297,14 @@ BEGIN Walk(NIL,NIL,UDF) END;
 (*
  *	Returns variable string (ansistring) version of the Texts
  *)
-Function StrList.ToLongString : LongString;
+Function StrList.ToLongString(sep : String) : LongString;
 Var cur : StrListNodePtr;
   	s	: LongString;
 Begin
 	cur := pHead;
 	s   := '';
 	while cur <> NIL do Begin
-		s := Concat(s, cur^.Key, #10);
+		s := Concat(s, cur^.Key, sep);
 		cur := cur^.Next
 	End;
     ToLongString := s
