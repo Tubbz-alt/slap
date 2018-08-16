@@ -5,6 +5,7 @@ What it does until now:
 * Supports slackpkg and [slackpkg+](http://slakfinder.org/slackpkg+.html)
 * Loads all package information into binary tree
 * Search by using regular expressions (PCRE)
+* Search package descriptions too
 * Select list to search based on repository and installed/uninstalled status
 
 Use `slap -h` for help
