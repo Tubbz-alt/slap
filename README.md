@@ -11,6 +11,8 @@ Use `slap -h` for help
 
 A static-linked version of executables is [here](https://github.com/nereusx/slap/raw/master/release/binaries.zip)
 
+INSTALL & REMOVE buttons does not work yet
+
 ## Screenshots
 
 ![startup](https://github.com/nereusx/slap/blob/master/images/lazslap-1.png)
