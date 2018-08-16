@@ -14,6 +14,8 @@ A static-linked version of executables is [here](https://github.com/nereusx/slap
 
 INSTALL & REMOVE buttons does not work yet
 
+I **NEED an icon** for the application, I'll appreciate any help.
+
 ## Screenshots
 
 ![startup](https://github.com/nereusx/slap/blob/master/images/lazslap-1.png)
