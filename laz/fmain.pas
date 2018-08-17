@@ -30,7 +30,7 @@ interface
 
 uses
 	Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-	StdCtrls, ComCtrls,
+	StdCtrls, ComCtrls, Unix,
     SBTree, SList, SlackPack, RegExpr;
 
 type
@@ -60,6 +60,8 @@ type
 		Splitter1: TSplitter;
 		StatusBar1: TStatusBar;
 		procedure btnGoClick(Sender: TObject);
+		procedure btnInstallClick(Sender: TObject);
+		procedure btnRemoveClick(Sender: TObject);
   procedure chkDescrChange(Sender: TObject);
   procedure cmbListChange(Sender: TObject);
   procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -75,6 +77,7 @@ type
        opt_repo : String;
 		opt_regexp : TRegExpr;
         opt_search_desc : Boolean;
+        opt_curpack : String;
        Procedure PopulateListBox(node : BTreeNodePtr);
        Procedure RebuildPackageList;
        Function	StoreRepo(node : StrListNodePtr) : StrListWalkResult;
@@ -172,6 +175,7 @@ Procedure TFMain.ShowPackage(node : BTreeNodePtr);
 Var	s : String;
 	data : PKGPtr;
 Begin
+    opt_curpack := node^.Key;
     data := node^.Ptr;
     s := '';
     if data^.bInst then
@@ -259,6 +263,30 @@ begin
     if length(s) > 0 then
         opt_regexp := TRegExpr.Create(s);
     RebuildPackageList;
+end;
+
+procedure TFMain.btnInstallClick(Sender: TObject);
+Var	status	: LongInt;
+    cmd		: String;
+begin
+    cmd := Concat('xterm -e ''', 'slackpkg', ' ', 'install', ' ', opt_curpack, '''');
+	status := fpSystem(cmd);
+//	ShowMessage('Command exited with status : ' + IntToStr(status));
+    pdb.Done;
+    pdb.Init;
+    RebuildPackageList;
+end;
+
+procedure TFMain.btnRemoveClick(Sender: TObject);
+Var	status : LongInt;
+	cmd		: String;
+begin
+	cmd := Concat('xterm -e ''', 'slackpkg', ' ', 'remove', ' ', opt_curpack, '''');
+	status := fpSystem(cmd);
+//	ShowMessage('Command exited with status : ' + IntToStr(status));
+	pdb.Done;
+	pdb.Init;
+	RebuildPackageList;
 end;
 
 end.

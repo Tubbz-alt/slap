@@ -319,6 +319,7 @@ object FMain: TFMain
           Top = 8
           Width = 75
           Caption = 'Install'
+          OnClick = btnInstallClick
           TabOrder = 0
         end
         object btnRemove: TButton
@@ -327,6 +328,7 @@ object FMain: TFMain
           Top = 8
           Width = 75
           Caption = 'Remove'
+          OnClick = btnRemoveClick
           TabOrder = 1
         end
       end
