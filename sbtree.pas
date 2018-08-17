@@ -55,7 +55,7 @@ Type
 
 	public
 		Constructor	Init;
-		Destructor	Free; virtual;
+		Destructor	Done; virtual;
 		Procedure	Clear;
 		Function	Insert(key : String; data : Pointer) : BTreeNodePtr;
 		Function	Find(key : String) : BTreeNodePtr;
@@ -93,7 +93,7 @@ Begin
 	Clear(root)
 End;
 
-Destructor BTree.Free;
+Destructor BTree.Done;
 Begin
 	Clear
 End;

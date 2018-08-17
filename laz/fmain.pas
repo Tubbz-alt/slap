@@ -220,7 +220,7 @@ begin
     	opt_regexp.Free;
         opt_regexp := NIL;
 		end;
-	pdb.Free;
+	pdb.Done;
 end;
 
 procedure TFMain.cmbListChange(Sender: TObject);

@@ -58,7 +58,7 @@ Type
 
 	public
 		Constructor	Init;
-		Destructor 	Free; virtual;
+		Destructor 	Done; virtual;
 		Constructor	Copy(src : StrList);
 		Procedure	Assign(src : StrList);
 		Procedure	Append(src : StrList);
@@ -145,7 +145,7 @@ End;
 (*
  * Deletes all nodes of the list.
  *)
-Destructor StrList.Free;
+Destructor StrList.Done;
 Begin
 	Clear;
 End;

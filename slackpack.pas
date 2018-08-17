@@ -59,7 +59,7 @@ Type
 		bInst : Boolean;	{ true if it is installed }
 		
 		Constructor Init(key, filename : String);
-		Destructor  Free; virtual;
+		Destructor  Done; virtual;
 	End;
 
 Type
@@ -88,7 +88,7 @@ Type
 
 	public
 		Constructor Init(debmsgs : Boolean = false);
-		Destructor  Free; virtual;		
+		Destructor  Done; virtual;		
 	End;
 
 (* --- *)
@@ -111,12 +111,12 @@ End;
 (*
  * Cleanup package object
  *)
-Destructor PKG.Free;
+Destructor PKG.Done;
 Begin
-	Desc.Free;
-	Vars.Free;
-	Repos.Free;
-	Vers.Free;
+	Desc.Done;
+	Vars.Done;
+	Repos.Done;
+	Vers.Done;
 End;
 
 (*
@@ -300,7 +300,7 @@ Begin
 		End;
 		cur := cur^.Next;
 	End; { While }
-	fileList.Free;
+	fileList.Done;
 End;
 
 (*
@@ -332,11 +332,11 @@ End;
 (*
  * Cleanup package database 
  *)
-Destructor SlackwarePDB.Free;
+Destructor SlackwarePDB.Done;
 Begin
-	packs.Free;
-	instlist.Free;
-	reposlist.Free;
+	packs.Done;
+	instlist.Done;
+	reposlist.Done;
 End;
 
 (*

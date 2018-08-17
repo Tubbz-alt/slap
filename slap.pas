@@ -284,5 +284,5 @@ Begin
 						IF opt_list_uninst THEN
 							pdb.packs.Walk(@PrintProc);
 
-	pdb.Free;
+	pdb.Done;
 End.
