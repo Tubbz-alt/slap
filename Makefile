@@ -46,5 +46,6 @@ push:
 	git commit -m "auto"
 	git push
 
-install:
+install: release
 	install -m 755 -o root -g root slap $(instdir)
+	install -m 755 -o root -g root laz/lazSlap $(instdir)

@@ -16,6 +16,15 @@ I **NEED an icon** for the application, I'll appreciate any help.
 
 I usually write in C and/or C++ but I wrote this in Free Pascal (Lazarus) since the VCL is the best library for GUI.
 
+## Install
+
+```
+git clone https://github.com/nereusx/slap.git
+cd slap
+make pack
+make install
+```
+
 ## Screenshots
 
 ![startup](https://github.com/nereusx/slap/blob/master/images/lazslap-1.png)
