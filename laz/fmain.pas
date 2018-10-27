@@ -42,6 +42,7 @@ type
 		btnRemove: TButton;
 		btnGo: TButton;
 		chkDescr: TCheckBox;
+		chkFiles: TCheckBox;
 		cmbList: TComboBox;
 		Image1: TImage;
 		Memo1: TMemo;
@@ -78,6 +79,7 @@ type
 		opt_regexp : TRegExpr;
         opt_search_desc : Boolean;
         opt_curpack : String;
+        opt_search_files : Boolean;
        Procedure PopulateListBox(node : BTreeNodePtr);
        Procedure RebuildPackageList;
        Function	StoreRepo(node : StrListNodePtr) : StrListWalkResult;
@@ -93,6 +95,11 @@ var
 implementation
 
 {$R *.lfm}
+
+Function RemoveDoubleLines(source : AnsiString) : AnsiString;
+Begin
+	RemoveDoubleLines := StringReplace(source, #10#10, '', [rfReplaceALL])
+End;
 
 { TFMain }
 
@@ -111,20 +118,25 @@ Begin
         End;
     if opt_regexp <> NIL then
         Begin
-        if opt_search_desc then
-            begin
-	    	if	(NOT opt_regexp.Exec(node^.Key))
-	        	AND
-				(NOT opt_regexp.Exec(data^.desc.toLongString)) then
+        if opt_search_files then Begin
+	    	if	(NOT opt_regexp.Exec(data^.Files.toLongString)) then
 				exit;
-            end
-        else
-        	begin
-   	    	if	NOT opt_regexp.Exec(node^.Key) then
-                exit;
+			end
+		else Begin
+	        if opt_search_desc then
+	            begin
+		    	if	(NOT opt_regexp.Exec(node^.Key))
+		        	AND
+					(NOT opt_regexp.Exec(data^.desc.toLongString)) then
+					exit;
+	            end
+	        else
+	        	begin
+	   	    	if	NOT opt_regexp.Exec(node^.Key) then
+	                exit;
+				end;
 			end;
 		end;
-
 	ListBox1.AddItem(node^.Key, NIL);
 end;
 
@@ -159,6 +171,7 @@ begin
     opt_installed := false;
     opt_uninstalled := false;
     opt_search_desc := false;
+    opt_search_files := false;
     opt_regexp := NIL;
     opt_repo := 'ALL';
     StatusBar1.SimpleText := 'Slackware Package DB ... Loading';
@@ -188,7 +201,9 @@ Begin
 	s := Concat(s, 'SIZE    : ', data^.USize, '; ', data^.CSize, ' compressed. ', #10);
 {			s := Concat(s, 'Variables    : ');
      data^.Vars.Print;}
-    s := Concat(s, #10, data^.desc.ToLongString, #10);
+    s := Concat(s, #10, RemoveDoubleLines(data^.desc.ToLongString), #10);
+    s := Concat(s, #10, 'FILE LIST:', #10);
+    s := Concat(s, data^.Files.toLongString(#10));
     Memo1.Text := s;
 end;
 
@@ -249,6 +264,7 @@ end;
 procedure TFMain.chkDescrChange(Sender: TObject);
 begin
     opt_search_desc := chkDescr.Checked;
+    opt_search_files := chkFiles.Checked;
 end;
 
 procedure TFMain.btnGoClick(Sender: TObject);

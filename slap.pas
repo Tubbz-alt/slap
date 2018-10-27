@@ -31,7 +31,7 @@ Program Slap;
 Uses SysUtils, SBTree, SList, Slackpack, RegExpr;
 
 Const
-	AppVersion  = '1.00';
+	AppVersion  = '1.10';
 
 Type
 	LongString = UTF8String;
@@ -39,9 +39,9 @@ Type
 Var
 	pdb : SlackwarePDB;
 
-	opt_verbose, opt_bsearch, opt_desc_bsearch, opt_brepo : Boolean;
+	opt_verbose, opt_bsearch, opt_file_bsearch, opt_desc_bsearch, opt_brepo : Boolean;
 	opt_names, opt_repolist, opt_list_inst, opt_list_uninst : Boolean;
-	opt_search, opt_desc_search, opt_repo : String;
+	opt_search, opt_desc_search, opt_file_search, opt_repo : String;
 
 (*
  * Parse command-line parameters
@@ -59,9 +59,12 @@ Var	i : Integer;
 		WriteLn('  -h, --help		Prints this screen and exits.');
 		WriteLn('  -v, --version		Prints the version information and exits.');
 		WriteLn('  -d, --debug		Prints verbose messages.');
-		WriteLn('  -s, --search pattern	Search information about a package. (1)');
+		WriteLn('  -sp, -s, --search pattern');
+		WriteLn('			Search information about a package. (1)');
 		WriteLn('  -sd, --search-desc pattern');
 		WriteLn('			Search in descriptions. (1)');
+		WriteLn('  -sf, -f, --search-file pattern');
+		WriteLn('			Search in file list. (1)');
 		WriteLn('  -n, --names		Display package names only instead of full information.');
 		WriteLn('  -r, --repos		Display a list of repositories.');
 		WriteLn('  -lr, --list-repo repo');
@@ -89,6 +92,8 @@ Var	i : Integer;
 
 Begin
 	{ WriteLn('Executable: ', ParamStr(0)); }
+	If ParamCount = 0 Then
+		PrintHelp;
 	For i := 1 to ParamCount do begin
 		{WriteLn('Param ', i, ': ', ParamStr(i));}
 		opt := ParamStr(i);
@@ -101,7 +106,7 @@ Begin
 				opt_verbose := true
 			Else If (opt = '-n') OR (opt = '--names') then
 				opt_names := true
-			Else If (opt = '-s') OR (opt = '--search') then Begin
+			Else If (opt = '-s') OR (opt = '-sp') OR (opt = '--search') then Begin
 				if ParamCount >= i + 1 then Begin
 					opt_bsearch := true;
 					opt_search := ParamStr(i+1);
@@ -110,11 +115,21 @@ Begin
 					WriteLn('Error: Missing search pattern');
 					Halt(1);
 				End
-			End
+			End		
 			Else If (opt = '-sd') OR (opt = '--search-desc') then Begin
 				if ParamCount >= i + 1 then Begin
 					opt_desc_bsearch := true;
 					opt_desc_search := ParamStr(i+1);
+				End
+				Else Begin
+					WriteLn('Error: Missing search pattern');
+					Halt(1);
+				End
+			End
+			Else If (opt = '-sf') OR (opt = '-f') OR (opt = '--search-file') then Begin
+				if ParamCount >= i + 1 then Begin
+					opt_file_bsearch := true;
+					opt_file_search := ParamStr(i+1);
 				End
 				Else Begin
 					WriteLn('Error: Missing search pattern');
@@ -238,6 +253,18 @@ Begin
 		PrintPackage(node);
 End;
 
+Procedure SearchFileProc(node : BTreeNodePtr);
+Var	data : PKGPtr;
+	ls_text : LongString;
+Begin
+	data := node^.Ptr;
+	if (opt_list_inst) and (NOT data^.bInst) then exit;
+	if (opt_list_uninst) and (data^.bInst) then exit;
+	ls_text := data^.Files.toLongString;
+	if (re<>NIL) AND (re.Exec(ls_text)) then
+		PrintPackage(node);
+End;
+
 (*
  * print report-list callback
  *)
@@ -265,24 +292,31 @@ Begin
 		re.Free;
 	END 
 	ELSE
-		IF opt_desc_bsearch THEN
+		IF opt_file_bsearch THEN
 		BEGIN
-			re := TRegExpr.Create(opt_desc_search);
-			pdb.packs.Walk(@SearchDescProc);
+			re := TRegExpr.Create(opt_file_search);
+			pdb.packs.Walk(@SearchFileProc);
 			re.Free;
 		END
 		ELSE
-			IF opt_brepo THEN
-				pdb.packs.Walk(@RepoListProc)
+			IF opt_desc_bsearch THEN
+			BEGIN
+				re := TRegExpr.Create(opt_desc_search);
+				pdb.packs.Walk(@SearchDescProc);
+				re.Free;
+			END
 			ELSE
-				IF opt_repolist THEN
-					pdb.reposlist.Print(#10)
+				IF opt_brepo THEN
+					pdb.packs.Walk(@RepoListProc)
 				ELSE
-					IF opt_list_inst THEN
-						pdb.packs.Walk(@PrintProc)
+					IF opt_repolist THEN
+						pdb.reposlist.Print(#10)
 					ELSE
-						IF opt_list_uninst THEN
-							pdb.packs.Walk(@PrintProc);
+						IF opt_list_inst THEN
+							pdb.packs.Walk(@PrintProc)
+						ELSE
+							IF opt_list_uninst THEN
+								pdb.packs.Walk(@PrintProc);
 
 	pdb.Done;
 End.

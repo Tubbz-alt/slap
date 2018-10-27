@@ -57,6 +57,7 @@ Type
 		Repos : StrList;	{ list of repositories }
 		Vers  : StrList;	{ list of versions on repositories }
 		bInst : Boolean;	{ true if it is installed }
+        Files : StrList;	{ list of files names in the package }
 		
 		Constructor Init(key, filename : String);
 		Destructor  Done; virtual;
@@ -106,6 +107,7 @@ Begin
 	Vars.Init;
 	Repos.Init;
 	Vers.Init;
+	Files.Init;
 End;
 
 (*
@@ -117,6 +119,7 @@ Begin
 	Vars.Done;
 	Repos.Done;
 	Vers.Done;
+	Files.Done;
 End;
 
 (*
@@ -227,14 +230,20 @@ Var	tf : TextFile;
 	buf, key, txt	: String;
 	fullname		: String;
 	idx				: Integer;
+    FileListMode	: Boolean;
 Begin
 	fullname := Concat(PKGDataDir, '/', fname);
 	If FileExists(fullname) then Begin
 		Assign(tf, fullname);
 		{$I-}Reset(tf);{$I+}
 		If IOResult = 0 then Begin
+            FileListMode := False;
 			While not EOF(tf) do Begin
 				ReadLn(tf, buf);
+                If FileListMode Then Begin
+					data^.Files.Add(buf);
+                    Continue
+                    END;
 				idx := Pos(Char(':'), buf);
 				if idx > 0 then Begin
 					key := Copy(buf, 1, idx - 1);
@@ -249,8 +258,10 @@ Begin
 						data^.Location := txt
 					ELSE IF key = 'PACKAGE DESCRIPTION' THEN
 						Continue
-					ELSE IF key = 'FILE LIST' THEN
-						BREAK
+					ELSE IF key = 'FILE LIST' THEN Begin
+                    	FileListMode := True;
+						Continue;
+						end
 					ELSE BEGIN
 						data^.Desc.Add(txt);
 					END
