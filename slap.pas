@@ -255,13 +255,11 @@ End;
 
 Procedure SearchFileProc(node : BTreeNodePtr);
 Var	data : PKGPtr;
-	ls_text : LongString;
 Begin
 	data := node^.Ptr;
 	if (opt_list_inst) and (NOT data^.bInst) then exit;
 	if (opt_list_uninst) and (data^.bInst) then exit;
-	ls_text := data^.Files.toLongString;
-	if (re<>NIL) AND (re.Exec(ls_text)) then
+	if (re<>NIL) AND (re.Exec(data^.Files.toLongString)) then
 		PrintPackage(node);
 End;
 
