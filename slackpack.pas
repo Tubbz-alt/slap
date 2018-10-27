@@ -23,7 +23,7 @@
  * Project Page: https://github.com/nereusx/slap
  * Nicholas Christopoulos (nereus@freemail.gr)
  *)
-{$MODE OBJFPC}
+{$MODE OBJFPC}{$H+}
 {$MODESWITCH NESTEDPROCVARS} 
 
 Unit Slackpack;

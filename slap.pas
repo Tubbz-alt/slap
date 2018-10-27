@@ -34,7 +34,7 @@ Const
 	AppVersion  = '1.10';
 
 Type
-	LongString = UTF8String;
+	LongString = AnsiString;
 
 Var
 	pdb : SlackwarePDB;
