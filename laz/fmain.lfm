@@ -3,6 +3,7 @@ object FMain: TFMain
   Height = 694
   Top = 265
   Width = 967
+  BorderWidth = 4
   Caption = 'Slackware Package Explorer'
   ClientHeight = 694
   ClientWidth = 967
@@ -10,22 +11,20 @@ object FMain: TFMain
   OnCreate = FormCreate
   LCLVersion = '1.6.4.0'
   object Panel3: TPanel
-    Left = 0
+    Left = 4
     Height = 72
-    Top = 0
-    Width = 955
+    Top = 4
+    Width = 959
     Align = alTop
-    BorderSpacing.Right = 12
     BevelOuter = bvNone
-    BorderWidth = 4
     ClientHeight = 72
-    ClientWidth = 955
+    ClientWidth = 959
     TabOrder = 0
     object cmbList: TComboBox
-      Left = 136
+      Left = 120
       Height = 27
       Top = 4
-      Width = 168
+      Width = 184
       ItemHeight = 0
       ItemIndex = 0
       Items.Strings = (
@@ -39,9 +38,9 @@ object FMain: TFMain
       Text = 'ALL'
     end
     object Label1: TLabel
-      Left = 16
+      Left = 8
       Height = 17
-      Top = 8
+      Top = 4
       Width = 91
       Caption = 'Packages LIST'
       ParentColor = False
@@ -70,7 +69,7 @@ object FMain: TFMain
       Text = 'All'
     end
     object Label3: TLabel
-      Left = 16
+      Left = 8
       Height = 17
       Top = 42
       Width = 100
@@ -78,10 +77,10 @@ object FMain: TFMain
       ParentColor = False
     end
     object txtSearchFor: TEdit
-      Left = 136
+      Left = 120
       Height = 27
       Top = 37
-      Width = 320
+      Width = 336
       OnChange = txtSearchForChange
       TabOrder = 2
     end
@@ -98,9 +97,9 @@ object FMain: TFMain
       AnchorSideTop.Control = Panel3
       AnchorSideRight.Control = Panel3
       AnchorSideRight.Side = asrBottom
-      Left = 726
+      Left = 734
       Height = 66
-      Top = 4
+      Top = 0
       Width = 225
       Anchors = [akTop, akRight]
       AutoSize = True
@@ -249,33 +248,30 @@ object FMain: TFMain
     end
   end
   object Panel4: TPanel
-    Left = 12
-    Height = 601
-    Top = 72
-    Width = 943
+    Left = 4
+    Height = 589
+    Top = 76
+    Width = 959
     Align = alClient
-    BorderSpacing.Left = 12
-    BorderSpacing.Right = 12
+    BorderSpacing.Bottom = 4
     BevelOuter = bvNone
-    BorderWidth = 4
-    Caption = 'Panel4'
-    ClientHeight = 601
-    ClientWidth = 943
+    ClientHeight = 589
+    ClientWidth = 959
     TabOrder = 1
     object Panel1: TPanel
-      Left = 4
-      Height = 593
-      Top = 4
+      Left = 0
+      Height = 589
+      Top = 0
       Width = 250
       Align = alLeft
       BevelOuter = bvNone
       Caption = 'Panel1'
-      ClientHeight = 593
+      ClientHeight = 589
       ClientWidth = 250
       TabOrder = 0
       object ListBox1: TListBox
         Left = 0
-        Height = 593
+        Height = 589
         Top = 0
         Width = 250
         Align = alClient
@@ -287,31 +283,31 @@ object FMain: TFMain
       end
     end
     object Splitter1: TSplitter
-      Left = 254
-      Height = 593
-      Top = 4
+      Left = 250
+      Height = 589
+      Top = 0
       Width = 9
     end
     object Panel5: TPanel
-      Left = 263
-      Height = 593
-      Top = 4
-      Width = 676
+      Left = 259
+      Height = 589
+      Top = 0
+      Width = 700
       Align = alClient
       BevelOuter = bvNone
       Caption = 'Panel5'
-      ClientHeight = 593
-      ClientWidth = 676
+      ClientHeight = 589
+      ClientWidth = 700
       TabOrder = 2
       object Panel2: TPanel
         Left = 0
         Height = 39
-        Top = 554
-        Width = 676
+        Top = 550
+        Width = 700
         Align = alBottom
         BevelOuter = bvNone
         ClientHeight = 39
-        ClientWidth = 676
+        ClientWidth = 700
         TabOrder = 0
         object btnInstall: TButton
           Left = 0
@@ -334,23 +330,23 @@ object FMain: TFMain
       end
       object Panel6: TPanel
         Left = 0
-        Height = 554
+        Height = 550
         Top = 0
-        Width = 676
+        Width = 700
         Align = alClient
         BevelOuter = bvLowered
         BorderWidth = 8
         Caption = 'Panel6'
-        ClientHeight = 554
-        ClientWidth = 676
+        ClientHeight = 550
+        ClientWidth = 700
         Color = clWindow
         ParentColor = False
         TabOrder = 1
         object Memo1: TMemo
           Left = 9
-          Height = 536
+          Height = 532
           Top = 9
-          Width = 658
+          Width = 682
           Align = alClient
           BorderStyle = bsNone
           Font.Height = -15
@@ -366,10 +362,10 @@ object FMain: TFMain
     end
   end
   object StatusBar1: TStatusBar
-    Left = 0
+    Left = 4
     Height = 21
-    Top = 673
-    Width = 967
+    Top = 669
+    Width = 959
     Panels = <>
   end
 end

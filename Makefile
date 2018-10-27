@@ -15,6 +15,9 @@ PCFLAGS = $(PCFLAGS_DEBUG)
 
 all: slap
 
+help:
+	@echo 'make [clean|pack|install]'
+
 sbtree.ppu: sbtree.pas
 	$(PC) $(PCFLAGS) sbtree.pas
 
