@@ -1,5 +1,3 @@
-* load files of each package
-* -sf search for file
 * add support for slackbuilds (sbopkg)
 * export to SQL
 
